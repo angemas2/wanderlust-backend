@@ -3,7 +3,7 @@ var router = express.Router();
 
 require("../models/connection");
 const User = require("../models/users");
-const { checkBody } = require("../modules/checkBody");
+import checkBody from "../modules/checkBody";
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 
@@ -41,20 +41,24 @@ router.post("/signup", (req: any, res: any) => {
   });
 });
 
-router.post('/signin', (req: any, res: any) => {
-   // Check if username and password are both given by user in frontend
-  if (!checkBody(req.body, ['username', 'password'])) {
-    res.json({ result: false, error: 'Champs vides ou manquants' });
+router.post("/signin", (req: any, res: any) => {
+  // Check if username and password are both given by user in frontend
+  if (!checkBody(req.body, ["username", "password"])) {
+    res.json({ result: false, error: "Champs vides ou manquants" });
     return;
   }
 
-  User.findOne({ username: req.body.username }).then(data => {
+  User.findOne({ username: req.body.username }).then((data: any) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       //username & password of user are correct, connection allowed
-      res.json({ result: true, token: data.token, profile_id: data.profile_id });
+      res.json({
+        result: true,
+        token: data.token,
+        profile_id: data.profile_id,
+      });
     } else {
       //username & password of user are incorrect, connection denied
-      res.json({ result: false, error: 'Utilisateur ou mot de passe erronné' });
+      res.json({ result: false, error: "Utilisateur ou mot de passe erronné" });
     }
   });
 });
