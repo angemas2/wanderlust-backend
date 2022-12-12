@@ -8,6 +8,7 @@ const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 
 router.post("/signup", (req: any, res: any) => {
+  // Check if username and password are both given by user in frontend
   if (!checkBody(req.body, ["username", "password"])) {
     res.json({ result: false, error: "Champs vides ou manquants"});
     return;
@@ -35,6 +36,24 @@ router.post("/signup", (req: any, res: any) => {
       res.json({ result: false, error: "L'utilisateur existe déjà" });
     }
 
+  });
+});
+
+router.post('/signin', (req: any, res: any) => {
+   // Check if username and password are both given by user in frontend
+  if (!checkBody(req.body, ['username', 'password'])) {
+    res.json({ result: false, error: 'Champs vides ou manquants' });
+    return;
+  }
+
+  User.findOne({ username: req.body.username }).then(data => {
+    if (data && bcrypt.compareSync(req.body.password, data.password)) {
+      //username & password of user are correct, connection allowed
+      res.json({ result: true, token: data.token, profile_id: data.profile_id });
+    } else {
+      //username & password of user are incorrect, connection denied
+      res.json({ result: false, error: 'Utilisateur ou mot de passe erronné' });
+    }
   });
 });
 
