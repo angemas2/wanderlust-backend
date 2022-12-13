@@ -12,12 +12,12 @@ const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 router.post("/signup", (req, res) => {
     // Check if username and password are both given by user in frontend
-    if (!(0, checkBody_1.default)(req.body, ["username", "password"])) {
+    if (!(0, checkBody_1.default)(req.body, ["email", "password"])) {
         res.json({ result: false, error: "Champs vides ou manquants" });
         return;
     }
     // Check if the user han not already been registered
-    User.findOne({ username: req.body.username }).then((data) => {
+    User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
             const hash = bcrypt.hashSync(req.body.password, 10);
             const newUser = new User({
