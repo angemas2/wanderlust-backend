@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
-import { IUser } from "../models/users";
 var express = require("express");
 var router = express.Router();
 
 require("../models/connection");
+import { Request, Response } from "express";
+import { IUser } from "../models/users";
 const User = require("../models/users");
 import checkBody from "../modules/checkBody";
 const uid2 = require("uid2");
@@ -50,7 +50,7 @@ router.post("/signin", (req: Request, res: Response) => {
     return;
   }
 
-  User.findOne({ username: req.body.email }).then((data: IUser) => {
+  User.findOne({ email: req.body.email }).then((data: IUser) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       //username & password of user are correct, connection allowed
       res.json({
