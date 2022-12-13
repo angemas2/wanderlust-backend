@@ -1,4 +1,4 @@
-function checkBody(body, keys) {
+export default function checkBody(body:any, keys:any) {
   let isValid = true;
 
   for (const field of keys) {
@@ -9,5 +9,3 @@ function checkBody(body, keys) {
 
   return isValid;
 }
-
-module.exports = { checkBody };
