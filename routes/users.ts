@@ -46,7 +46,7 @@ router.post('/signin', (req: any, res: any) => {
     return;
   }
 
-  User.findOne({ username: req.body.username }).then(data => {
+  User.findOne({ email: req.body.email }).then(data => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       //username & password of user are correct, connection allowed
       res.json({ result: true, token: data.token, profile_id: data.profile_id });
