@@ -43,11 +43,11 @@ router.post("/signup", (req, res) => {
 });
 router.post("/signin", (req, res) => {
     // Check if username and password are both given by user in frontend
-    if (!(0, checkBody_1.default)(req.body, ["username", "password"])) {
+    if (!(0, checkBody_1.default)(req.body, ["email", "password"])) {
         res.json({ result: false, error: "Champs vides ou manquants" });
         return;
     }
-    User.findOne({ username: req.body.username }).then((data) => {
+    User.findOne({ email: req.body.email }).then((data) => {
         if (data && bcrypt.compareSync(req.body.password, data.password)) {
             //username & password of user are correct, connection allowed
             res.json({
