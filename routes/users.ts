@@ -11,7 +11,7 @@ const bcrypt = require("bcrypt");
 
 router.post("/signup", (req: Request, res: Response) => {
   // Check if username and password are both given by user in frontend
-  if (!checkBody(req.body, ["email", "password"])) {
+  if (!checkBody(req.body, ["username","email", "password"])) {
     res.json({ result: false, error: "Champs vides ou manquants" });
     return;
   }
@@ -27,7 +27,7 @@ router.post("/signup", (req: Request, res: Response) => {
         password: hash,
         token: uid2(32),
         profile_id: uid2(32),
-        registrationBy: req.body.registrationMethod
+        registrationBy: req.body.registrationBy
       });
 
       newUser.save().then((data: IUser) => {
@@ -77,7 +77,7 @@ router.post("/facebook", (req: Request, res: Response) => {
         email: req.body.email,
         token: uid2(32),
         profile_id: uid2(32),
-        registrationBy: req.body.registrationMethod
+        registrationBy: req.body.registrationBy
       });
 
       newUser.save().then((data: IUser) => {
@@ -112,7 +112,7 @@ router.post("/google", (req: Request, res: Response) => {
         email: req.body.email,
         token: uid2(32),
         profile_id: uid2(32),
-        registrationBy: req.body.registrationMethod
+        registrationBy: req.body.registrationBy
       });
 
       newUser.save().then((data: IUser) => {
