@@ -1,11 +1,10 @@
 const request = require("supertest");
 const users = require("../routes/users");
 
-it("POST /users/signup", async () => {
-  const res = await request(users).post("/signup").send({
-    username: "usertest",
-    email: "john@gmail.com",
-    password: "azerty123",
+it("POST signin", async () => {
+  const res = await request(users).post("/signin").send({
+    username: "angemas",
+    password: "test123",
   });
 
   expect(res.statusCode).toBe(200);
