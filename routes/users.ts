@@ -2,20 +2,22 @@ var express = require("express");
 var router = express.Router();
 
 require("../models/connection");
+import { Request, Response } from "express";
+import { IUser } from "../models/users";
 const User = require("../models/users");
 import checkBody from "../modules/checkBody";
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 
-router.post("/signup", (req: any, res: any) => {
+router.post("/signup", (req: Request, res: Response) => {
   // Check if username and password are both given by user in frontend
-  if (!checkBody(req.body, ["username", "password"])) {
+  if (!checkBody(req.body, ["email", "password"])) {
     res.json({ result: false, error: "Champs vides ou manquants" });
     return;
   }
 
   // Check if the user han not already been registered
-  User.findOne({ username: req.body.username }).then((data: any) => {
+  User.findOne({ email: req.body.email }).then((data: IUser) => {
     if (data === null) {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
@@ -27,7 +29,7 @@ router.post("/signup", (req: any, res: any) => {
         profile_id: uid2(32),
       });
 
-      newUser.save().then((data: any) => {
+      newUser.save().then((data: IUser) => {
         res.json({
           result: true,
           token: newUser.token,
@@ -41,14 +43,14 @@ router.post("/signup", (req: any, res: any) => {
   });
 });
 
-router.post("/signin", (req: any, res: any) => {
+router.post("/signin", (req: Request, res: Response) => {
   // Check if username and password are both given by user in frontend
-  if (!checkBody(req.body, ["username", "password"])) {
+  if (!checkBody(req.body, ["email", "password"])) {
     res.json({ result: false, error: "Champs vides ou manquants" });
     return;
   }
 
-  User.findOne({ username: req.body.username }).then((data: any) => {
+  User.findOne({ email: req.body.email }).then((data: IUser) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
       //username & password of user are correct, connection allowed
       res.json({
