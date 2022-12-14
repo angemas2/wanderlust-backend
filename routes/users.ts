@@ -27,6 +27,7 @@ router.post("/signup", (req: Request, res: Response) => {
         password: hash,
         token: uid2(32),
         profile_id: uid2(32),
+        registrationBy: req.body.registrationMethod
       });
 
       newUser.save().then((data: IUser) => {
@@ -61,6 +62,70 @@ router.post("/signin", (req: Request, res: Response) => {
     } else {
       //username & password of user are incorrect, connection denied
       res.json({ result: false, error: "Utilisateur ou mot de passe erronné" });
+    }
+  });
+});
+
+router.post("/facebook", (req: Request, res: Response) => {
+
+  // Check if the user han not already been registered
+  User.findOne({ email: req.body.email }).then((data: IUser) => {
+    if (data === null) {
+
+      const newUser = new User({
+        username: req.body.username,
+        email: req.body.email,
+        token: uid2(32),
+        profile_id: uid2(32),
+        registrationBy: req.body.registrationMethod
+      });
+
+      newUser.save().then((data: IUser) => {
+        res.json({
+          result: true,
+          username: data.username,
+          token: data.token,
+          profile_id: data.profile_id,
+        });
+      });
+    } else {
+      //user already exists in database
+      res.json({ 
+        result: true, 
+        username: data.username,
+        token: data.token,
+        profile_id: data.profile_id,
+       
+      });
+    }
+  });
+});
+
+router.post("/google", (req: Request, res: Response) => {
+
+  // Check if the user han not already been registered
+  User.findOne({ email: req.body.email }).then((data: IUser) => {
+    if (data === null) {
+
+      const newUser = new User({
+        username: req.body.username,
+        email: req.body.email,
+        token: uid2(32),
+        profile_id: uid2(32),
+        registrationBy: req.body.registrationMethod
+      });
+
+      newUser.save().then((data: IUser) => {
+        res.json({
+          result: true,
+          username: data.username,
+          token: data.token,
+          profile_id: data.profile_id,
+        });
+      });
+    } else {
+      //user already exists in database
+      res.json({ result: false, error: "L'utilisateur existe déjà" });
     }
   });
 });
