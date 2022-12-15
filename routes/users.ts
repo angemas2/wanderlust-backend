@@ -5,9 +5,11 @@ require("../models/connection");
 import { Request, Response } from "express";
 import { IUser } from "../models/users";
 import { IProfile } from "../models/profiles";
+import checkBody from "../modules/checkBody";
+
 const User = require("../models/users");
 const Profile = require("../models/profiles");
-import checkBody from "../modules/checkBody";
+
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 
@@ -28,15 +30,13 @@ router.post("/signup", (req: Request, res: Response) => {
         email: req.body.email,
         password: hash,
         token: uid2(32),
-        profile_id: uid2(32),
-        registrationBy: req.body.registrationBy,
+        profile_id: "null",
+        registrationBy: req.body.registrationBy
       });
 
       newUser.save().then((data: IUser) => {
         res.json({
           result: true,
-          token: newUser.token,
-          profile_id: newUser.profile_id,
         });
       });
     } else {
@@ -128,5 +128,19 @@ router.post("/google", (req: Request, res: Response) => {
     }
   });
 });
+
+router.put("changeProfileID/:email", (req: Request, res: Response) => {
+  User.updateOne(
+    {email: req.params.email}, 
+    {profile_id: req.params.profile_id}
+    ).then((data: IUser) => {
+      if (data) {
+        res.json({
+          result: true,
+          profile_id: data.profile_id,
+        })
+      }
+    })
+})
 
 module.exports = router;

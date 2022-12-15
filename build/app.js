@@ -8,8 +8,12 @@ var debug = require("debug")("backend:server");
 var http = require("http");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
+<<<<<<< HEAD
 var viewpointsRouter = require("./routes/viewpoints");
 var itinerariesRouter = require("./routes/itineraries");
+=======
+var profilesRouter = require("./routes/profiles");
+>>>>>>> 49d9b144e019b562b1f2727a5e48d9dd5449ae86
 var app = express();
 const cors = require("cors");
 app.use(cors());
@@ -20,10 +24,16 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+<<<<<<< HEAD
 app.use("/viewpoints", viewpointsRouter);
 app.use("/itineraries", itinerariesRouter);
 var port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
+=======
+app.use("/profiles", profilesRouter);
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+>>>>>>> 49d9b144e019b562b1f2727a5e48d9dd5449ae86
 var server = http.createServer(app);
 server.listen(port);
 server.on("error", onError);

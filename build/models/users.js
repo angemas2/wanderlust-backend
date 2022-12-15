@@ -6,7 +6,7 @@ const userSchema = new mongoose_1.Schema({
     email: { type: String, required: true },
     password: { type: String, required: false },
     token: { type: String, required: true },
-    profile_id: { type: String, required: true },
+    profile_id: { type: String, required: false },
     registrationBy: { type: String, required: true },
 });
 const User = (0, mongoose_1.model)("users", userSchema);
