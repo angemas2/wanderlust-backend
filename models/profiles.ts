@@ -13,12 +13,12 @@ export interface IProfile {
 }
 
 const ProfileSchema = new Schema<IProfile>({
-    profile_id: {type: String, required: true},
+    profile_id: {type: mongoose.Schema.Types.ObjectId, required: true},
     picture: { type: String, required: true },
     location: { type: String, required: false },
     name: { type: String, required: false },
     firstName: { type: String, required: false},
-    activities_id: { type: String, required: true},
+    activities_id: { type: String, required: false},
     bio: { type: String, required: false},
     preferences: {type: Object, required: false},
     badge_id: {type:String, required: false},
