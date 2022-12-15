@@ -14,7 +14,7 @@ const userSchema = new Schema<IUser>({
   email: { type: String, required: true },
   password: { type: String, required: false },
   token: { type: String, required: true },
-  profile_id: { type: String, required: true },
+  profile_id: { type: String, required: true }, //clé étrangere 
   registrationBy: { type: String, required: true },
 });
 

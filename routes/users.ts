@@ -4,7 +4,9 @@ var router = express.Router();
 require("../models/connection");
 import { Request, Response } from "express";
 import { IUser } from "../models/users";
+import { IProfile } from "../models/profiles";
 const User = require("../models/users");
+const Profile = require("../models/profiles");
 import checkBody from "../modules/checkBody";
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
@@ -102,6 +104,8 @@ router.post("/google", (req: Request, res: Response) => {
   // Check if the user han not already been registered
   User.findOne({ email: req.body.email }).then((data: IUser) => {
     if (data === null) {
+      //create new profile
+
       const newUser = new User({
         username: req.body.username,
         email: req.body.email,
