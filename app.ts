@@ -9,7 +9,8 @@ var http = require("http");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var poiRouter = require("./routes/poi");
+var viewpointsRouter = require("./routes/viewpoints");
+var itinerariesRouter = require("./routes/itineraries");
 
 var app = express();
 
@@ -24,7 +25,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/poi", poiRouter);
+app.use("/viewpoints", viewpointsRouter);
+app.use("/itineraries", itinerariesRouter);
 
 var port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
