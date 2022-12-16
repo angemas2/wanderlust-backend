@@ -12,6 +12,7 @@ var viewpointsRouter = require("./routes/viewpoints");
 var itinerariesRouter = require("./routes/itineraries");
 var profilesRouter = require("./routes/profiles");
 var activitiesRouter = require("./routes/activities");
+
 var app = express();
 const cors = require("cors");
 app.use(cors());
@@ -26,6 +27,7 @@ app.use("/viewpoints", viewpointsRouter);
 app.use("/itineraries", itinerariesRouter);
 app.use("/profiles", profilesRouter);
 app.use("/activities", activitiesRouter);
+
 var port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 var server = http.createServer(app);

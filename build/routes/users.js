@@ -17,28 +17,53 @@ router.post("/signup", (req, res) => {
         res.json({ result: false, error: "Champs vides ou manquants" });
         return;
     }
-    // Check if the user han not already been registered
-    User.findOne({ email: req.body.email }).then((data) => {
-        if (data === null) {
-            const hash = bcrypt.hashSync(req.body.password, 10);
-            const newUser = new User({
-                username: req.body.username,
-                email: req.body.email,
-                password: hash,
-                token: uid2(32),
-                profile_id: "null",
-                registrationBy: req.body.registrationBy
-            });
-            newUser.save().then((data) => {
+    // Create a Profile
+    const newProfile = new Profile({
+        profile_id: uid2(32),
+        picture: "default.png",
+        location: "Unknown",
+        name: "Unknown",
+        firstName: "Unknown",
+        activities_id: "default",
+        bio: "none",
+        preferences: { id: "default", weight: 0, liked: false },
+        badge_id: "default",
+    });
+    newProfile.save().then((profileData) => {
+        User.findOne({ email: req.body.email }).then((userData) => {
+            if (userData) { // If yes > Delete Profile and send error
+                Profile.findOneAndDelete({ id: profileData.id });
                 res.json({
-                    result: true,
+                    result: false,
+                    error: "Utilisateur existant pour cette adresse email",
                 });
+                return;
+            }
+        });
+        User.findOne({ username: req.body.username }).then((userData) => {
+            if (userData) { // If yes > Delete Profile and send error
+                Profile.findOneAndDelete({ id: profileData.id });
+                res.json({ result: false, error: "nom d'utilisateur déjà existant" });
+                return;
+            }
+        });
+        // If all fields are completed and User's email and username doesn't exists, then User is created
+        const hash = bcrypt.hashSync(req.body.password, 10);
+        const newUser = new User({
+            username: req.body.username,
+            email: req.body.email,
+            password: hash,
+            token: uid2(32),
+            profile_id: profileData.id,
+            registrationBy: "email",
+        });
+        newUser.save().then((data) => {
+            res.json({
+                result: true,
+                token: data.token,
+                profile_id: data.profile_id,
             });
-        }
-        else {
-            //user already exists in database
-            res.json({ result: false, error: "L'utilisateur existe déjà" });
-        }
+        });
     });
 });
 router.post("/signin", (req, res) => {
@@ -66,19 +91,31 @@ router.post("/facebook", (req, res) => {
     // Check if the user han not already been registered
     User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
-            const newUser = new User({
-                username: req.body.username,
-                email: req.body.email,
-                token: uid2(32),
+            const newProfile = new Profile({
                 profile_id: uid2(32),
-                registrationBy: req.body.registrationBy,
+                picture: "default.png",
+                location: "Unknown",
+                name: "Unknown",
+                firstName: "Unknown",
+                activities_id: "default",
+                bio: "none",
+                preferences: { id: "default", weight: 0, liked: false },
+                badge_id: "default",
             });
-            newUser.save().then((data) => {
-                res.json({
-                    result: true,
-                    username: data.username,
-                    token: data.token,
-                    profile_id: data.profile_id,
+            newProfile.save().then((profileData) => {
+                const newUser = new User({
+                    username: req.body.username,
+                    email: req.body.email,
+                    token: uid2(32),
+                    profile_id: profileData.id,
+                    registrationBy: "facebook",
+                });
+                newUser.save().then((data) => {
+                    res.json({
+                        result: true,
+                        token: data.token,
+                        profile_id: data.profile_id,
+                    });
                 });
             });
         }
@@ -97,34 +134,40 @@ router.post("/google", (req, res) => {
     // Check if the user han not already been registered
     User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
-            //create new profile
-            const newUser = new User({
-                username: req.body.username,
-                email: req.body.email,
-                token: uid2(32),
+            const newProfile = new Profile({
                 profile_id: uid2(32),
-                registrationBy: req.body.registrationBy,
+                picture: "default.png",
+                location: "Unknown",
+                name: "Unknown",
+                firstName: "Unknown",
+                activities_id: "default",
+                bio: "none",
+                preferences: { id: "default", weight: 0, liked: false },
+                badge_id: "default",
             });
-            newUser.save().then((data) => {
-                res.json({
-                    result: true,
-                    username: data.username,
-                    token: data.token,
-                    profile_id: data.profile_id,
+            newProfile.save().then((profileData) => {
+                const newUser = new User({
+                    username: req.body.username,
+                    email: req.body.email,
+                    token: uid2(32),
+                    profile_id: profileData.id,
+                    registrationBy: "google",
+                });
+                newUser.save().then((data) => {
+                    res.json({
+                        result: true,
+                        token: data.token,
+                        profile_id: data.profile_id,
+                    });
                 });
             });
         }
         else {
             //user already exists in database
-            res.json({ result: false, error: "L'utilisateur existe déjà" });
-        }
-    });
-});
-router.put("changeProfileID/:email", (req, res) => {
-    User.updateOne({ email: req.params.email }, { profile_id: req.params.profile_id }).then((data) => {
-        if (data) {
             res.json({
                 result: true,
+                username: data.username,
+                token: data.token,
                 profile_id: data.profile_id,
             });
         }
