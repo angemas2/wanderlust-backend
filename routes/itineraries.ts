@@ -11,16 +11,16 @@ router.post("/addItinerary", (req: Request, res: Response) => {
   Itinerary.findOne({ name: req.body.name }).then((data: IItinerary) => {
     if (!data) {
       const NewItinerary = new Itinerary({
-        profile_id: 1348,
+        profile_id: req.params.profile_id,
         viewpoints_id: req.body.viewpoints_id,
-        km: 12,
-        map: "",
-        photos: "",
+        km: req.body.totaldistance,
+        map: req.body.map,
+        photos: req.body.photos,
         name: req.body.name,
         description: req.body.description,
-        isPublic: false,
-        isCustom: false,
-        rating: 3,
+        isPublic: req.body.public,
+        isCustom: req.body.type,
+        rating: 0,
         tags: "",
         followers: "",
         isSponsor: false,
