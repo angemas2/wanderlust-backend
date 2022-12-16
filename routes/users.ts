@@ -7,10 +7,8 @@ import { IUser } from "../models/users";
 import { IProfile } from "../models/profiles";
 import checkBody from "../modules/checkBody";
 
-
 const User = require("../models/users");
 const Profile = require("../models/profiles");
-
 
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
@@ -21,25 +19,26 @@ router.post("/signup", (req: Request, res: Response) => {
     res.json({ result: false, error: "Champs vides ou manquants" });
     return;
   }
-  
+
   // Create a Profile
 
   const newProfile = new Profile({
-    profile_id: uid2(32),
     picture: "default.png",
     location: "Unknown",
     name: "Unknown",
     firstName: "Unknown",
     activities_id: "default",
     bio: "none",
-    preferences:  {id: "default", weight: 0, liked: false},
+    preferences: { id: "default", weight: 0, liked: false },
     badge_id: "default",
   });
 
-  newProfile.save().then((profileData: IProfile) => { 
-    User.findOne({ email: req.body.email }).then((userData: IUser) => { // Check if User's email han not already been registered
-      if (userData) { // If yes > Delete Profile and send error
-        Profile.findOneAndDelete({ id: profileData.id });
+  newProfile.save().then((profileData: any) => {
+    User.findOne({ email: req.body.email }).then((userData: IUser) => {
+      // Check if User's email han not already been registered
+      if (userData) {
+        // If yes > Delete Profile and send error
+        Profile.findOneAndDelete({ id: profileData._id });
         res.json({
           result: false,
           error: "Utilisateur existant pour cette adresse email",
@@ -48,9 +47,11 @@ router.post("/signup", (req: Request, res: Response) => {
       }
     });
 
-    User.findOne({ username: req.body.username }).then((userData: IUser) => { // - Check if User's username exists
-      if (userData) { // If yes > Delete Profile and send error
-        Profile.findOneAndDelete({ id: profileData.id });
+    User.findOne({ username: req.body.username }).then((userData: IUser) => {
+      // - Check if User's username exists
+      if (userData) {
+        // If yes > Delete Profile and send error
+        Profile.findOneAndDelete({ id: profileData._id });
         res.json({ result: false, error: "nom d'utilisateur déjà existant" });
         return;
       }
@@ -77,8 +78,6 @@ router.post("/signup", (req: Request, res: Response) => {
     });
   });
 });
- 
-
 
 router.post("/signin", (req: Request, res: Response) => {
   // Check if username and password are both given by user in frontend
@@ -107,18 +106,17 @@ router.post("/facebook", (req: Request, res: Response) => {
   User.findOne({ email: req.body.email }).then((data: IUser) => {
     if (data === null) {
       const newProfile = new Profile({
-        profile_id: uid2(32),
         picture: "default.png",
         location: "Unknown",
         name: "Unknown",
         firstName: "Unknown",
         activities_id: "default",
         bio: "none",
-        preferences:  {id: "default", weight: 0, liked: false},
+        preferences: { id: "default", weight: 0, liked: false },
         badge_id: "default",
       });
-    
-      newProfile.save().then((profileData: IProfile) => { 
+
+      newProfile.save().then((profileData: any) => {
         const newUser = new User({
           username: req.body.username,
           email: req.body.email,
@@ -126,7 +124,7 @@ router.post("/facebook", (req: Request, res: Response) => {
           profile_id: profileData.id,
           registrationBy: "facebook",
         });
-    
+
         newUser.save().then((data: IUser) => {
           res.json({
             result: true,
@@ -152,18 +150,17 @@ router.post("/google", (req: Request, res: Response) => {
   User.findOne({ email: req.body.email }).then((data: IUser) => {
     if (data === null) {
       const newProfile = new Profile({
-        profile_id: uid2(32),
         picture: "default.png",
         location: "Unknown",
         name: "Unknown",
         firstName: "Unknown",
         activities_id: "default",
         bio: "none",
-        preferences:  {id: "default", weight: 0, liked: false},
+        preferences: { id: "default", weight: 0, liked: false },
         badge_id: "default",
       });
-    
-      newProfile.save().then((profileData: IProfile) => { 
+
+      newProfile.save().then((profileData: any) => {
         const newUser = new User({
           username: req.body.username,
           email: req.body.email,
@@ -171,7 +168,7 @@ router.post("/google", (req: Request, res: Response) => {
           profile_id: profileData.id,
           registrationBy: "google",
         });
-    
+
         newUser.save().then((data: IUser) => {
           res.json({
             result: true,
