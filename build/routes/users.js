@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var router = express.Router();
 require("../models/connection");
+
 const checkBody_1 = __importDefault(require("../modules/checkBody"));
 const User = require("../models/users");
 const Profile = require("../models/profiles");
@@ -71,7 +72,7 @@ router.post("/facebook", (req, res) => {
                 email: req.body.email,
                 token: uid2(32),
                 profile_id: uid2(32),
-                registrationBy: req.body.registrationBy
+                registrationBy: req.body.registrationBy,
             });
             newUser.save().then((data) => {
                 res.json({
@@ -97,12 +98,13 @@ router.post("/google", (req, res) => {
     // Check if the user han not already been registered
     User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
+            //create new profile
             const newUser = new User({
                 username: req.body.username,
                 email: req.body.email,
                 token: uid2(32),
                 profile_id: uid2(32),
-                registrationBy: req.body.registrationBy
+                registrationBy: req.body.registrationBy,
             });
             newUser.save().then((data) => {
                 res.json({

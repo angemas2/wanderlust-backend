@@ -9,5 +9,5 @@ const userSchema = new mongoose_1.Schema({
     profile_id: { type: String, required: false },
     registrationBy: { type: String, required: true },
 });
-const User = (0, mongoose_1.model)('users', userSchema);
+const User = (0, mongoose_1.model)("users", userSchema);
 module.exports = User;

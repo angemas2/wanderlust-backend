@@ -1,12 +1,12 @@
 import { Schema, model } from "mongoose";
 
 export interface IUser {
-    username: string;
-    email: string;
-    password: string;
-    token: string;
-    profile_id: string;
-    registrationBy: string;
+  username: string;
+  email: string;
+  password: string;
+  token: string;
+  profile_id: string;
+  registrationBy: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -18,6 +18,6 @@ const userSchema = new Schema<IUser>({
     registrationBy: { type: String, required: true},
 });
 
-const User = model<IUser>('users', userSchema);
+const User = model<IUser>("users", userSchema);
 
 module.exports = User;
