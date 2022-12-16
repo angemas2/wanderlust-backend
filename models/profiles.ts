@@ -1,7 +1,7 @@
-import mongoose, { Schema, model, ObjectId } from "mongoose";
+import { Schema, model, ObjectId } from 'mongoose';
 
 export interface IProfile {
-  profile_id: ObjectId;
+  id: ObjectId;
   picture: string;
   location: string;
   name: string;
@@ -13,7 +13,6 @@ export interface IProfile {
 }
 
 const ProfileSchema = new Schema<IProfile>({
-  profile_id: { type: mongoose.Schema.Types.ObjectId, required: true },
   picture: { type: String, required: true },
   location: { type: String, required: false },
   name: { type: String, required: false },
@@ -24,6 +23,6 @@ const ProfileSchema = new Schema<IProfile>({
   badge_id: { type: String, required: false },
 });
 
-const Profile = model<IProfile>("profiles", ProfileSchema);
+const Profile = model<IProfile>('profiles', ProfileSchema);
 
 module.exports = Profile;
