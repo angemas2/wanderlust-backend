@@ -3,7 +3,7 @@ import { Schema, model, ObjectId } from "mongoose";
 
 export interface IItinerary {
   profile_id: ObjectId;
-  viewpoints_id: ObjectId;
+  viewpoints_id: ObjectId[];
   km: Number;
   map: String;
   photos: String[] | null;
@@ -19,8 +19,8 @@ export interface IItinerary {
 }
 
 const itinerarySchema = new Schema<IItinerary>({
-  profile_id: { type: Number, required: false },
-  viewpoints_id: { type: mongoose.Schema.Types.ObjectId, ref: "viewpoints" },
+  profile_id: { type: mongoose.Schema.Types.ObjectId, ref: "profiles" },
+  viewpoints_id: [{ type: mongoose.Schema.Types.ObjectId, ref: "viewpoints" }],
   km: { type: Number, required: true },
   isPublic: { type: Boolean, required: true },
   isCustom: { type: Boolean, required: true },
