@@ -19,10 +19,21 @@ router.post("/signup", (req: Request, res: Response) => {
     res.json({ result: false, error: "Champs vides ou manquants" });
     return;
   }
+  // Create a Profile
 
+  const newProfile = new Profile({
+    profile_id: uid2(32),
+    picture: "default",
+  }); 
+
+  newProfile.save().then((profileData:IProfile) => {
+    User.findOne({email:req.body.email}).then((userData:IUser) => {
+      if (data) {
+        findAndDeleteOne({ data })
+      }
   // Check if the user han not already been registered
   User.findOne({ email: req.body.email }).then((data: IUser) => {
-    if (data === null) {
+    if (data) {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
       const newUser = new User({
@@ -34,11 +45,18 @@ router.post("/signup", (req: Request, res: Response) => {
         registrationBy: req.body.registrationBy
       });
 
-      newUser.save().then((data: IUser) => {
-        res.json({
-          result: true,
-        });
-      });
+     
+          // - Check if User exists
+          // -- If yes > Delete Profile and send error
+          // Profile.findOneandDelete({_id:profileData._id}).then(retourne l'erreur)
+          // -- If not > Create a user and add Profile ID to User
+          newUser.save().then((data: IUser) => {
+            res.json({
+              result: true,
+            });
+          });
+        })
+      })
     } else {
       //user already exists in database
       res.json({ result: false, error: "L'utilisateur existe déjà" });
