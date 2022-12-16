@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 var express = require("express");
+
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
@@ -9,20 +10,11 @@ var http = require("http");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-
 var viewpointsRouter = require("./routes/viewpoints");
 var itinerariesRouter = require("./routes/itineraries");
 var profilesRouter = require("./routes/profiles");
 
-
-var poiRouter = require("./routes/poi");
-
-
-var profilesRouter = require("./routes/profiles");
-
-
 var app = express();
-
 const cors = require("cors");
 app.use(cors());
 
@@ -34,17 +26,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-
 app.use("/viewpoints", viewpointsRouter);
 app.use("/itineraries", itinerariesRouter);
 app.use("/profiles", profilesRouter);
-
-
-app.use("/poi", poiRouter);
-
-
-app.use("/profiles", profilesRouter);
-
 
 var port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
