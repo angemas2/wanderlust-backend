@@ -7,8 +7,10 @@ import { IUser } from "../models/users";
 import { IProfile } from "../models/profiles";
 import checkBody from "../modules/checkBody";
 
+
 const User = require("../models/users");
 const Profile = require("../models/profiles");
+
 
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
@@ -32,6 +34,7 @@ router.post("/signup", (req: Request, res: Response) => {
         token: uid2(32),
         profile_id: "null",
         registrationBy: req.body.registrationBy
+
       });
 
       newUser.save().then((data: IUser) => {

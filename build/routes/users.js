@@ -6,11 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var router = express.Router();
 require("../models/connection");
-<<<<<<< HEAD
-const User = require("../models/users");
-const Profile = require("../models/profiles");
-=======
->>>>>>> 49d9b144e019b562b1f2727a5e48d9dd5449ae86
+
 const checkBody_1 = __importDefault(require("../modules/checkBody"));
 const User = require("../models/users");
 const Profile = require("../models/profiles");
@@ -31,13 +27,8 @@ router.post("/signup", (req, res) => {
                 email: req.body.email,
                 password: hash,
                 token: uid2(32),
-<<<<<<< HEAD
-                profile_id: uid2(32),
-                registrationBy: req.body.registrationBy,
-=======
                 profile_id: "null",
                 registrationBy: req.body.registrationBy
->>>>>>> 49d9b144e019b562b1f2727a5e48d9dd5449ae86
             });
             newUser.save().then((data) => {
                 res.json({
