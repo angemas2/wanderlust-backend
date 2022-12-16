@@ -10,7 +10,7 @@ router.post("/addItinerary", (req, res) => {
     Itinerary.findOne({ name: req.body.name }).then((data) => {
         if (!data) {
             const NewItinerary = new Itinerary({
-                profile_id: req.params.profile_id,
+                profile_id: req.body.profile_id,
                 viewpoints_id: viewpointsList,
                 km: req.body.km,
                 map: req.body.map,
@@ -37,7 +37,9 @@ router.post("/addItinerary", (req, res) => {
     });
 });
 router.get("/:city", (req, res) => {
-    Itinerary.find({ profile_id: req.params.city }).then((data) => {
+    Itinerary.find({ city: req.params.city, public: true })
+        .populate("viewpoints_id")
+        .then((data) => {
         if (data) {
             res.json({ result: true, data: data });
         }
