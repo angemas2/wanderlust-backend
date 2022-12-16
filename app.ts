@@ -15,8 +15,6 @@ var itinerariesRouter = require("./routes/itineraries");
 var profilesRouter = require("./routes/profiles");
 
 
-var poiRouter = require("./routes/poi");
-
 
 var profilesRouter = require("./routes/profiles");
 
@@ -40,7 +38,6 @@ app.use("/itineraries", itinerariesRouter);
 app.use("/profiles", profilesRouter);
 
 
-app.use("/poi", poiRouter);
 
 
 app.use("/profiles", profilesRouter);

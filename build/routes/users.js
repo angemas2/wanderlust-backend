@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var router = express.Router();
 require("../models/connection");
-
 const checkBody_1 = __importDefault(require("../modules/checkBody"));
 const User = require("../models/users");
 const Profile = require("../models/profiles");

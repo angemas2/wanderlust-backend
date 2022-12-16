@@ -8,7 +8,6 @@ router.post("/addPoint", (req, res) => {
     Viewpoint.findOne({ location: req.body.location }).then((data) => {
         if (!data) {
             const NewViewpoint = new Viewpoint({
-                profile_id: req.body.id,
                 name: req.body.name,
                 description: req.body.description,
                 photos: req.body.photos,

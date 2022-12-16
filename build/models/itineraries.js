@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
 const mongoose_1 = require("mongoose");
 const itinerarySchema = new mongoose_1.Schema({
-    profile_id: { type: Number, required: false },
-    viewpoints_id: { type: mongoose.Schema.Types.ObjectId, ref: "viewpoints" },
+    profile_id: { type: mongoose.Schema.Types.ObjectId, ref: "profiles" },
+    viewpoints_id: [{ type: mongoose.Schema.Types.ObjectId, ref: "viewpoints" }],
     km: { type: Number, required: true },
     isPublic: { type: Boolean, required: true },
     isCustom: { type: Boolean, required: true },
