@@ -2,7 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const ProfileSchema = new mongoose_1.Schema({
+
+
+ 
     profile_id: { type: mongoose.Schema.Types.ObjectId, required: true },
+
     picture: { type: String, required: true },
     location: { type: String, required: false },
     name: { type: String, required: false },

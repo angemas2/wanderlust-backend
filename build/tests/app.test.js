@@ -10,11 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const request = require("supertest");
 const users = require("../routes/users");
-it("POST /users/signup", () => __awaiter(void 0, void 0, void 0, function* () {
-    const res = yield request(users).post("/signup").send({
-        username: "usertest",
-        email: "john@gmail.com",
-        password: "azerty123",
+it("POST signin", () => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield request(users).post("/signin").send({
+        username: "angemas",
+        password: "test123",
     });
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(true);

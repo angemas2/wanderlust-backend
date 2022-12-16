@@ -5,14 +5,12 @@ require("../models/connection");
 import { Request, Response } from "express";
 import { IUser } from "../models/users";
 import { IProfile } from "../models/profiles";
-
-const User = require("../models/users");
-const Profile = require("../models/profiles");
-
 import checkBody from "../modules/checkBody";
 
+
 const User = require("../models/users");
 const Profile = require("../models/profiles");
+
 
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
