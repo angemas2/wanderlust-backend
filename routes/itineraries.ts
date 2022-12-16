@@ -8,28 +8,31 @@ const Viewpoint = require("../models/viewpoints");
 const Itinerary = require("../models/itineraries");
 
 router.post("/addItinerary", (req: Request, res: Response) => {
+  let viewpointsList = req.body.viewpoints_id.split(",");
+
   Itinerary.findOne({ name: req.body.name }).then((data: IItinerary) => {
     if (!data) {
       const NewItinerary = new Itinerary({
         profile_id: req.params.profile_id,
-        viewpoints_id: req.body.viewpoints_id,
-        km: req.body.totaldistance,
+        viewpoints_id: viewpointsList,
+        km: req.body.km,
         map: req.body.map,
         photos: req.body.photos,
         name: req.body.name,
         description: req.body.description,
         isPublic: req.body.public,
-        isCustom: req.body.type,
+        isCustom: req.body.custom,
         rating: 0,
         tags: "",
         followers: "",
         isSponsor: false,
+        city: req.body.city,
       });
 
       NewItinerary.save().then((x: any) => {
-        Itinerary.find()
+        Itinerary.findById(x._id)
           .populate("viewpoints_id")
-          .then((data: IItinerary) => res.json({ data }));
+          .then((data: IItinerary) => res.json({ result:true, data }));
       });
     } else {
       res.json({ result: false, error: "itinerary already exists" });

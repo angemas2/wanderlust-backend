@@ -8,14 +8,10 @@ var debug = require("debug")("backend:server");
 var http = require("http");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-
 var viewpointsRouter = require("./routes/viewpoints");
 var itinerariesRouter = require("./routes/itineraries");
-
 var profilesRouter = require("./routes/profiles");
-
 var profilesRouter = require("./routes/profiles");
-
 var app = express();
 const cors = require("cors");
 app.use(cors());
@@ -26,16 +22,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-
 app.use("/viewpoints", viewpointsRouter);
 app.use("/itineraries", itinerariesRouter);
+app.use("/profiles", profilesRouter);
+app.use("/profiles", profilesRouter);
 var port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
-
-app.use("/profiles", profilesRouter);
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
-
 var server = http.createServer(app);
 server.listen(port);
 server.on("error", onError);
