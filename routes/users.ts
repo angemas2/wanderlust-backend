@@ -37,31 +37,41 @@ router.post('/signup', (req: Request, res: Response) => {
     User.findOne({ email: req.body.email }).then((userData: IUser) => {
       // Check if User's email han not already been registered. If no, create User
       if (!userData) {
-        const hash = bcrypt.hashSync(req.body.password, 10);
+        User.findOne({ username: req.body.username }).then((data: IUser) => {
+          if (!data) {
+            const hash = bcrypt.hashSync(req.body.password, 10);
 
-        const newUser = new User({
-          username: req.body.username,
-          email: req.body.email,
-          password: hash,
-          token: uid2(32),
-          profile_id: profileData.id,
-          registrationBy: 'email',
-        });
+            const newUser = new User({
+              username: req.body.username,
+              email: req.body.email,
+              password: hash,
+              token: uid2(32),
+              profile_id: profileData.id,
+              registrationBy: 'email',
+            });
 
-        newUser.save().then((data: IUser) => {
-          User.findOne({ email: data.email })
-            .populate('profile_id')
-            .then(
+            newUser.save().then((data: IUser) => {
+              User.findOne({ email: data.email })
+                .populate('profile_id')
+                .then(
+                  res.json({
+                    result: true,
+                    token: data.token,
+                    profile_id: data.profile_id,
+                  })
+                );
+            });
+          } else {
+            Profile.findByIdAndDelete(profileData.id).then(
               res.json({
-                result: true,
-                token: data.token,
-                profile_id: data.profile_id,
+                result: false,
+                error: "Nom d'utilisateur déjà pris",
               })
             );
+          }
         });
         // If yes, Delete Profile and send error
       } else {
-        console.log(profileData.id);
         Profile.findByIdAndDelete(profileData.id).then(
           res.json({
             result: false,
