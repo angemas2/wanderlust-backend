@@ -13,7 +13,7 @@ router.post("/addItinerary", (req: Request, res: Response) => {
   Itinerary.findOne({ name: req.body.name }).then((data: IItinerary) => {
     if (!data) {
       const NewItinerary = new Itinerary({
-        profile_id: req.params.profile_id,
+        profile_id: req.body.profile_id,
         viewpoints_id: viewpointsList,
         km: req.body.km,
         map: req.body.map,
@@ -32,7 +32,7 @@ router.post("/addItinerary", (req: Request, res: Response) => {
       NewItinerary.save().then((x: any) => {
         Itinerary.findById(x._id)
           .populate("viewpoints_id")
-          .then((data: IItinerary) => res.json({ result:true, data }));
+          .then((data: IItinerary) => res.json({ result: true, data }));
       });
     } else {
       res.json({ result: false, error: "itinerary already exists" });
@@ -41,13 +41,15 @@ router.post("/addItinerary", (req: Request, res: Response) => {
 });
 
 router.get("/:city", (req: Request, res: Response) => {
-  Itinerary.find({ profile_id: req.params.city }).then((data: IItinerary) => {
-    if (data) {
-      res.json({ result: true, data: data });
-    } else {
-      res.json({ result: false, error: "no itinerary" });
-    }
-  });
+  Itinerary.find({ city: req.params.city, public: true })
+    .populate("viewpoints_id")
+    .then((data: IItinerary) => {
+      if (data) {
+        res.json({ result: true, data: data });
+      } else {
+        res.json({ result: false, error: "no itinerary" });
+      }
+    });
 });
 
 module.exports = router;
