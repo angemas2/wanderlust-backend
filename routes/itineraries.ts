@@ -9,7 +9,6 @@ const Itinerary = require("../models/itineraries");
 
 router.post("/addItinerary", (req: Request, res: Response) => {
   console.log(req.body);
-  
 
   Itinerary.findOne({ name: req.body.name }).then((data: IItinerary) => {
     if (!data) {
@@ -32,7 +31,7 @@ router.post("/addItinerary", (req: Request, res: Response) => {
 
       NewItinerary.save().then((x: any) => {
         Itinerary.findById(x._id)
-          .populate("viewpoints_id")
+          .populate("viewpoints_id", "profile_id")
           .then((data: IItinerary) => res.json({ result: true, data }));
       });
     } else {
@@ -42,8 +41,11 @@ router.post("/addItinerary", (req: Request, res: Response) => {
 });
 
 router.get("/:city", (req: Request, res: Response) => {
-  Itinerary.find({ city: req.params.city, public: true })
-    .populate("viewpoints_id")
+  Itinerary.find({
+    city: { $regex: new RegExp(req.params.city, "i") },
+    public: true,
+  })
+    .populate("viewpoints_id", "profile_id")
     .then((data: IItinerary) => {
       if (data) {
         res.json({ result: true, data: data });
@@ -55,7 +57,7 @@ router.get("/:city", (req: Request, res: Response) => {
 
 router.get("/profile/:profile", (req: Request, res: Response) => {
   Itinerary.find({ profile_id: req.params.profile })
-    .populate("viewpoints_id")
+    .populate("viewpoints_id", "profile_id")
     .then((data: IItinerary) => {
       if (data) {
         res.json({ result: true, data: data });

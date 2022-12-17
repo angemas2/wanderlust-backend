@@ -7,12 +7,11 @@ const Viewpoint = require("../models/viewpoints");
 const Itinerary = require("../models/itineraries");
 router.post("/addItinerary", (req, res) => {
     console.log(req.body);
-    let viewpointsList = req.body.viewpointsList.split(",");
     Itinerary.findOne({ name: req.body.name }).then((data) => {
         if (!data) {
             const NewItinerary = new Itinerary({
                 profile_id: req.body.profile_id,
-                viewpoints_id: viewpointsList,
+                viewpoints_id: req.body.viewpointsList,
                 km: req.body.km,
                 map: req.body.map,
                 photos: req.body.photos,
@@ -28,7 +27,7 @@ router.post("/addItinerary", (req, res) => {
             });
             NewItinerary.save().then((x) => {
                 Itinerary.findById(x._id)
-                    .populate("viewpoints_id")
+                    .populate("viewpoints_id", "profile_id")
                     .then((data) => res.json({ result: true, data }));
             });
         }
@@ -38,8 +37,11 @@ router.post("/addItinerary", (req, res) => {
     });
 });
 router.get("/:city", (req, res) => {
-    Itinerary.find({ city: req.params.city, public: true })
-        .populate("viewpoints_id")
+    Itinerary.find({
+        city: { $regex: new RegExp(req.params.city, "i") },
+        public: true,
+    })
+        .populate("viewpoints_id", "profile_id")
         .then((data) => {
         if (data) {
             res.json({ result: true, data: data });
@@ -51,7 +53,7 @@ router.get("/:city", (req, res) => {
 });
 router.get("/profile/:profile", (req, res) => {
     Itinerary.find({ profile_id: req.params.profile })
-        .populate("viewpoints_id")
+        .populate("viewpoints_id", "profile_id")
         .then((data) => {
         if (data) {
             res.json({ result: true, data: data });
