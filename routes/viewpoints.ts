@@ -20,7 +20,11 @@ router.post("/addPoint", (req: Request, res: Response) => {
         res.json({ result: true, data: data });
       });
     } else {
-      res.json({ result: false, error: "viewpoint already exists" });
+      res.json({
+        result: true,
+        message: "viewpoint already exists",
+        data: data,
+      });
     }
   });
 });
