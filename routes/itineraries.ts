@@ -8,13 +8,14 @@ const Viewpoint = require("../models/viewpoints");
 const Itinerary = require("../models/itineraries");
 
 router.post("/addItinerary", (req: Request, res: Response) => {
-  let viewpointsList = req.body.viewpointsList.split(",");
+  console.log(req.body);
+  
 
   Itinerary.findOne({ name: req.body.name }).then((data: IItinerary) => {
     if (!data) {
       const NewItinerary = new Itinerary({
         profile_id: req.body.profile_id,
-        viewpoints_id: viewpointsList,
+        viewpoints_id: req.body.viewpointsList,
         km: req.body.km,
         map: req.body.map,
         photos: req.body.photos,
