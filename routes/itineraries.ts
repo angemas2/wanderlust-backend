@@ -8,7 +8,7 @@ const Viewpoint = require("../models/viewpoints");
 const Itinerary = require("../models/itineraries");
 
 router.post("/addItinerary", (req: Request, res: Response) => {
-  let viewpointsList = req.body.viewpoints_id.split(",");
+  let viewpointsList = req.body.viewpointsList.split(",");
 
   Itinerary.findOne({ name: req.body.name }).then((data: IItinerary) => {
     if (!data) {
@@ -69,7 +69,7 @@ router.get("/followed/:profile", (req: Request, res: Response) => {
     .populate("viewpoints_id")
     .then((data: IItinerary[]) => {
       if (data) {
-        let newdata = data.filter((e:any) =>
+        let newdata = data.filter((e: any) =>
           e.followers.includes(req.params.profile)
         );
         res.json({ result: true, data: newdata });

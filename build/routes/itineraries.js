@@ -6,7 +6,7 @@ require("../models/connection");
 const Viewpoint = require("../models/viewpoints");
 const Itinerary = require("../models/itineraries");
 router.post("/addItinerary", (req, res) => {
-    let viewpointsList = req.body.viewpoints_id.split(",");
+    let viewpointsList = req.body.viewpointsList.split(",");
     Itinerary.findOne({ name: req.body.name }).then((data) => {
         if (!data) {
             const NewItinerary = new Itinerary({

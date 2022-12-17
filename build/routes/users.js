@@ -19,7 +19,6 @@ router.post('/signup', (req, res) => {
     }
     // Create a Profile
     const newProfile = new Profile({
-
         picture: 'default.png',
         location: 'Unknown',
         name: 'Unknown',
@@ -60,17 +59,14 @@ router.post('/signup', (req, res) => {
                             error: "Nom d'utilisateur déjà pris",
                         }));
                     }
-
                 });
                 // If yes, Delete Profile and send error
             }
-
             else {
                 Profile.findByIdAndDelete(profileData.id).then(res.json({
                     result: false,
                     error: 'Utilisateur existant pour cette adresse email',
                 }));
-
             }
         });
     });
@@ -101,7 +97,6 @@ router.post('/facebook', (req, res) => {
     User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
             const newProfile = new Profile({
-
                 picture: 'default.png',
                 location: 'Unknown',
                 name: 'Unknown',
@@ -110,7 +105,6 @@ router.post('/facebook', (req, res) => {
                 bio: 'none',
                 preferences: { id: 'default', weight: 0, liked: false },
                 badge_id: 'default',
-
             });
             newProfile.save().then((profileData) => {
                 const newUser = new User({
@@ -145,7 +139,6 @@ router.post('/google', (req, res) => {
     User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
             const newProfile = new Profile({
-
                 picture: 'default.png',
                 location: 'Unknown',
                 name: 'Unknown',
@@ -154,7 +147,6 @@ router.post('/google', (req, res) => {
                 bio: 'none',
                 preferences: { id: 'default', weight: 0, liked: false },
                 badge_id: 'default',
-
             });
             newProfile.save().then((profileData) => {
                 const newUser = new User({
