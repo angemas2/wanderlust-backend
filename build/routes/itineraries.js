@@ -48,4 +48,29 @@ router.get("/:city", (req, res) => {
         }
     });
 });
+router.get("/profile/:profile", (req, res) => {
+    Itinerary.find({ profile_id: req.params.profile })
+        .populate("viewpoints_id")
+        .then((data) => {
+        if (data) {
+            res.json({ result: true, data: data });
+        }
+        else {
+            res.json({ result: false, error: "no itinerary for this profile" });
+        }
+    });
+});
+router.get("/followed/:profile", (req, res) => {
+    Itinerary.find()
+        .populate("viewpoints_id")
+        .then((data) => {
+        if (data) {
+            let newdata = data.filter((e) => e.followers.includes(req.params.profile));
+            res.json({ result: true, data: newdata });
+        }
+        else {
+            res.json({ result: false, error: "no itinerary found" });
+        }
+    });
+});
 module.exports = router;

@@ -52,4 +52,31 @@ router.get("/:city", (req: Request, res: Response) => {
     });
 });
 
+router.get("/profile/:profile", (req: Request, res: Response) => {
+  Itinerary.find({ profile_id: req.params.profile })
+    .populate("viewpoints_id")
+    .then((data: IItinerary) => {
+      if (data) {
+        res.json({ result: true, data: data });
+      } else {
+        res.json({ result: false, error: "no itinerary for this profile" });
+      }
+    });
+});
+
+router.get("/followed/:profile", (req: Request, res: Response) => {
+  Itinerary.find()
+    .populate("viewpoints_id")
+    .then((data: IItinerary[]) => {
+      if (data) {
+        let newdata = data.filter((e:any) =>
+          e.followers.includes(req.params.profile)
+        );
+        res.json({ result: true, data: newdata });
+      } else {
+        res.json({ result: false, error: "no itinerary found" });
+      }
+    });
+});
+
 module.exports = router;

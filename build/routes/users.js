@@ -19,7 +19,6 @@ router.post("/signup", (req, res) => {
     }
     // Create a Profile
     const newProfile = new Profile({
-        profile_id: uid2(32),
         picture: "default.png",
         location: "Unknown",
         name: "Unknown",
@@ -31,8 +30,10 @@ router.post("/signup", (req, res) => {
     });
     newProfile.save().then((profileData) => {
         User.findOne({ email: req.body.email }).then((userData) => {
-            if (userData) { // If yes > Delete Profile and send error
-                Profile.findOneAndDelete({ id: profileData.id });
+            // Check if User's email han not already been registered
+            if (userData) {
+                // If yes > Delete Profile and send error
+                Profile.findOneAndDelete({ id: profileData._id });
                 res.json({
                     result: false,
                     error: "Utilisateur existant pour cette adresse email",
@@ -41,8 +42,10 @@ router.post("/signup", (req, res) => {
             }
         });
         User.findOne({ username: req.body.username }).then((userData) => {
-            if (userData) { // If yes > Delete Profile and send error
-                Profile.findOneAndDelete({ id: profileData.id });
+            // - Check if User's username exists
+            if (userData) {
+                // If yes > Delete Profile and send error
+                Profile.findOneAndDelete({ id: profileData._id });
                 res.json({ result: false, error: "nom d'utilisateur déjà existant" });
                 return;
             }
@@ -92,7 +95,6 @@ router.post("/facebook", (req, res) => {
     User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
             const newProfile = new Profile({
-                profile_id: uid2(32),
                 picture: "default.png",
                 location: "Unknown",
                 name: "Unknown",
@@ -135,7 +137,6 @@ router.post("/google", (req, res) => {
     User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
             const newProfile = new Profile({
-                profile_id: uid2(32),
                 picture: "default.png",
                 location: "Unknown",
                 name: "Unknown",
