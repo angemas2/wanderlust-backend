@@ -31,7 +31,7 @@ router.post("/addItinerary", (req: Request, res: Response) => {
 
       NewItinerary.save().then((x: any) => {
         Itinerary.findById(x._id)
-          .populate("viewpoints_id", "profile_id")
+          .populate(["viewpoints_id", "profile_id"])
           .then((data: IItinerary) => res.json({ result: true, data }));
       });
     } else {
@@ -45,7 +45,7 @@ router.get("/:city", (req: Request, res: Response) => {
     city: { $regex: new RegExp(req.params.city, "i") },
     public: true,
   })
-    .populate("viewpoints_id", "profile_id")
+    .populate(["viewpoints_id","profile_id"])
     .then((data: IItinerary) => {
       if (data) {
         res.json({ result: true, data: data });
@@ -57,7 +57,7 @@ router.get("/:city", (req: Request, res: Response) => {
 
 router.get("/profile/:profile", (req: Request, res: Response) => {
   Itinerary.find({ profile_id: req.params.profile })
-    .populate("viewpoints_id", "profile_id")
+    .populate(["viewpoints_id", "profile_id"])
     .then((data: IItinerary) => {
       if (data) {
         res.json({ result: true, data: data });
