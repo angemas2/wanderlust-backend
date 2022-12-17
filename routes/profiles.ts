@@ -2,7 +2,6 @@ var express = require("express");
 var router = express.Router();
 import { Request, Response } from "express";
 import { IProfile } from "../models/profiles";
-import { IUser } from "../models/users";
 
 require("../models/connection");
 
