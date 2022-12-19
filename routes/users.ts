@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import { IUser } from '../models/users';
 import { IProfile } from '../models/profiles';
 import checkBody from '../modules/checkBody';
+import { profile } from 'console';
 
 const User = require('../models/users');
 const Profile = require('../models/profiles');
@@ -20,10 +21,11 @@ router.post('/signup', (req: Request, res: Response) => {
     return;
   }
 
+  const picture = '../tmp/default.jpg';
   // Create a Profile
 
   const newProfile = new Profile({
-    picture: 'default.png',
+    picture: picture,
     location: 'Unknown',
     name: 'Unknown',
     firstName: 'Unknown',
@@ -53,13 +55,15 @@ router.post('/signup', (req: Request, res: Response) => {
             newUser.save().then((data: IUser) => {
               User.findOne({ email: data.email })
                 .populate('profile_id')
-                .then(
+                .then((newData: IUser) => {
                   res.json({
                     result: true,
-                    token: data.token,
-                    profile_id: data.profile_id,
-                  })
-                );
+                    email: newData.email,
+                    username: newData.username,
+                    token: newData.token,
+                    profile_id: newData.profile_id,
+                  });
+                });
             });
           } else {
             Profile.findByIdAndDelete(profileData.id).then(
@@ -92,12 +96,17 @@ router.post('/signin', (req: Request, res: Response) => {
 
   User.findOne({ email: req.body.email }).then((data: IUser) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      //username & password of user are correct, connection allowed
-      res.json({
-        result: true,
-        token: data.token,
-        profile_id: data.profile_id,
-      });
+      User.findOne({ email: data.email })
+        .populate('profile_id')
+        .then((newData: IUser) => {
+          res.json({
+            result: true,
+            email: newData.email,
+            username: newData.username,
+            token: newData.token,
+            profile_id: newData.profile_id,
+          });
+        });
     } else {
       //username & password of user are incorrect, connection denied
       res.json({ result: false, error: 'Utilisateur ou mot de passe erronné' });
@@ -130,11 +139,15 @@ router.post('/facebook', (req: Request, res: Response) => {
         });
 
         newUser.save().then((data: IUser) => {
-          res.json({
-            result: true,
-            token: data.token,
-            profile_id: data.profile_id,
-          });
+          User.findOne({ email: data.email })
+            .populate('profile_id')
+            .then(
+              res.json({
+                result: true,
+                token: data.token,
+                profile_id: data.profile_id,
+              })
+            );
         });
       });
     } else {
@@ -154,7 +167,7 @@ router.post('/google', (req: Request, res: Response) => {
   User.findOne({ email: req.body.email }).then((data: IUser) => {
     if (data === null) {
       const newProfile = new Profile({
-        picture: 'default.png',
+        picture: `../tmp/icon.png`,
         location: 'Unknown',
         name: 'Unknown',
         firstName: 'Unknown',
@@ -174,11 +187,15 @@ router.post('/google', (req: Request, res: Response) => {
         });
 
         newUser.save().then((data: IUser) => {
-          res.json({
-            result: true,
-            token: data.token,
-            profile_id: data.profile_id,
-          });
+          User.findOne({ email: data.email })
+            .populate('profile_id')
+            .then(
+              res.json({
+                result: true,
+                token: data.token,
+                profile_id: data.profile_id,
+              })
+            );
         });
       });
     } else {

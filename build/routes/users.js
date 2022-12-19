@@ -17,9 +17,10 @@ router.post('/signup', (req, res) => {
         res.json({ result: false, error: 'Champs vides ou manquants' });
         return;
     }
+    const picture = '../tmp/default.jpg';
     // Create a Profile
     const newProfile = new Profile({
-        picture: 'default.png',
+        picture: picture,
         location: 'Unknown',
         name: 'Unknown',
         firstName: 'Unknown',
@@ -46,11 +47,15 @@ router.post('/signup', (req, res) => {
                         newUser.save().then((data) => {
                             User.findOne({ email: data.email })
                                 .populate('profile_id')
-                                .then(res.json({
-                                result: true,
-                                token: data.token,
-                                profile_id: data.profile_id,
-                            }));
+                                .then((newData) => {
+                                res.json({
+                                    result: true,
+                                    email: newData.email,
+                                    username: newData.username,
+                                    token: newData.token,
+                                    profile_id: newData.profile_id,
+                                });
+                            });
                         });
                     }
                     else {
@@ -79,11 +84,16 @@ router.post('/signin', (req, res) => {
     }
     User.findOne({ email: req.body.email }).then((data) => {
         if (data && bcrypt.compareSync(req.body.password, data.password)) {
-            //username & password of user are correct, connection allowed
-            res.json({
-                result: true,
-                token: data.token,
-                profile_id: data.profile_id,
+            User.findOne({ email: data.email })
+                .populate('profile_id')
+                .then((newData) => {
+                res.json({
+                    result: true,
+                    email: newData.email,
+                    username: newData.username,
+                    token: newData.token,
+                    profile_id: newData.profile_id,
+                });
             });
         }
         else {
@@ -115,11 +125,13 @@ router.post('/facebook', (req, res) => {
                     registrationBy: 'facebook',
                 });
                 newUser.save().then((data) => {
-                    res.json({
+                    User.findOne({ email: data.email })
+                        .populate('profile_id')
+                        .then(res.json({
                         result: true,
                         token: data.token,
                         profile_id: data.profile_id,
-                    });
+                    }));
                 });
             });
         }
@@ -139,7 +151,7 @@ router.post('/google', (req, res) => {
     User.findOne({ email: req.body.email }).then((data) => {
         if (data === null) {
             const newProfile = new Profile({
-                picture: 'default.png',
+                picture: `../tmp/icon.png`,
                 location: 'Unknown',
                 name: 'Unknown',
                 firstName: 'Unknown',
@@ -157,11 +169,13 @@ router.post('/google', (req, res) => {
                     registrationBy: 'google',
                 });
                 newUser.save().then((data) => {
-                    res.json({
+                    User.findOne({ email: data.email })
+                        .populate('profile_id')
+                        .then(res.json({
                         result: true,
                         token: data.token,
                         profile_id: data.profile_id,
-                    });
+                    }));
                 });
             });
         }
