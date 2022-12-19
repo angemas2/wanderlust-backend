@@ -12,13 +12,12 @@ const Itinerary = require("../models/itineraries");
 router.post("/addItinerary", (req: Request, res: Response) => {
   console.log(req.body);
 
-  const ids = req.body.viewpointsList.split(",");
 
   Itinerary.findOne({ name: req.body.name }).then((data: IItinerary) => {
     if (!data) {
       const NewItinerary = new Itinerary({
         profile_id: req.body.profile_id,
-        viewpoints_id: ids,
+        viewpoints_id: req.body.viewpointsList,
         km: req.body.km,
         map: req.body.map,
         photos: req.body.photos,
