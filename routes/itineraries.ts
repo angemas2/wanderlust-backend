@@ -7,14 +7,18 @@ import { IItinerary } from "../models/itineraries";
 const Viewpoint = require("../models/viewpoints");
 const Itinerary = require("../models/itineraries");
 
+// create a new itinerary
+
 router.post("/addItinerary", (req: Request, res: Response) => {
   console.log(req.body);
+
+  const ids = req.body.viewpointsList.split(",");
 
   Itinerary.findOne({ name: req.body.name }).then((data: IItinerary) => {
     if (!data) {
       const NewItinerary = new Itinerary({
         profile_id: req.body.profile_id,
-        viewpoints_id: req.body.viewpointsList,
+        viewpoints_id: ids,
         km: req.body.km,
         map: req.body.map,
         photos: req.body.photos,
@@ -40,12 +44,14 @@ router.post("/addItinerary", (req: Request, res: Response) => {
   });
 });
 
+// get itinerary by city
+
 router.get("/:city", (req: Request, res: Response) => {
   Itinerary.find({
     city: { $regex: new RegExp(req.params.city, "i") },
     public: true,
   })
-    .populate(["viewpoints_id","profile_id"])
+    .populate(["viewpoints_id", "profile_id"])
     .then((data: IItinerary) => {
       if (data) {
         res.json({ result: true, data: data });
@@ -54,6 +60,8 @@ router.get("/:city", (req: Request, res: Response) => {
       }
     });
 });
+
+//get itineraries created by the user
 
 router.get("/profile/:profile", (req: Request, res: Response) => {
   Itinerary.find({ profile_id: req.params.profile })
@@ -67,6 +75,8 @@ router.get("/profile/:profile", (req: Request, res: Response) => {
     });
 });
 
+// get itineraries followed by the user
+
 router.get("/followed/:profile", (req: Request, res: Response) => {
   Itinerary.find()
     .populate("viewpoints_id")
@@ -78,6 +88,37 @@ router.get("/followed/:profile", (req: Request, res: Response) => {
         res.json({ result: true, data: newdata });
       } else {
         res.json({ result: false, error: "no itinerary found" });
+      }
+    });
+});
+
+// add user as follower when he is following an existing itinerary
+
+router.put("/followers", async (req: Request, res: Response) => {
+  const ItineraryId = await Itinerary.findById(req.body.id);
+
+  const followers = ItineraryId.followers;
+  const userId = req.body.userId;
+
+  Itinerary.findById(req.body.id)
+    .populate(["viewpoints_id", "profile_id"])
+    .then((data: IItinerary) => {
+      if (data.followers?.includes(userId)) {
+        res.json({
+          result: true,
+          message: "itinerary already followed",
+          data: data,
+        });
+      } else {
+        Itinerary.findByIdAndUpdate(req.body.id, {
+          followers: [...followers, userId],
+        }).then(
+          Itinerary.findById(req.body.id)
+            .populate(["viewpoints_id", "profile_id"])
+            .then((data: IItinerary) =>
+              res.json({ result: true, message: "added", data: data })
+            )
+        );
       }
     });
 });
