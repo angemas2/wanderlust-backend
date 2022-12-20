@@ -14,6 +14,8 @@ const Profile = require('../models/profiles');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
+const avatar = process.env.DEFAULT_AVATAR;
+
 router.post('/signup', (req: Request, res: Response) => {
   // Check if username and password are both given by user in frontend
   if (!checkBody(req.body, ['username', 'email', 'password'])) {
@@ -21,11 +23,10 @@ router.post('/signup', (req: Request, res: Response) => {
     return;
   }
 
-  const picture = '../tmp/default.jpg';
   // Create a Profile
 
   const newProfile = new Profile({
-    picture: picture,
+    picture: avatar,
     location: 'Unknown',
     name: 'Unknown',
     firstName: 'Unknown',
@@ -55,7 +56,7 @@ router.post('/signup', (req: Request, res: Response) => {
             newUser.save().then((data: IUser) => {
               User.findOne({ email: data.email })
                 .populate('profile_id')
-                .then((newData: IUser) => {
+                .then((newData: IUser, profileData: IProfile) => {
                   res.json({
                     result: true,
                     email: newData.email,

@@ -11,16 +11,16 @@ const User = require('../models/users');
 const Profile = require('../models/profiles');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
+const avatar = process.env.DEFAULT_AVATAR;
 router.post('/signup', (req, res) => {
     // Check if username and password are both given by user in frontend
     if (!(0, checkBody_1.default)(req.body, ['username', 'email', 'password'])) {
         res.json({ result: false, error: 'Champs vides ou manquants' });
         return;
     }
-    const picture = '../tmp/default.jpg';
     // Create a Profile
     const newProfile = new Profile({
-        picture: picture,
+        picture: avatar,
         location: 'Unknown',
         name: 'Unknown',
         firstName: 'Unknown',
@@ -47,7 +47,7 @@ router.post('/signup', (req, res) => {
                         newUser.save().then((data) => {
                             User.findOne({ email: data.email })
                                 .populate('profile_id')
-                                .then((newData) => {
+                                .then((newData, profileData) => {
                                 res.json({
                                     result: true,
                                     email: newData.email,
