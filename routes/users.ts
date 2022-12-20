@@ -6,7 +6,6 @@ import { Request, Response } from 'express';
 import { IUser } from '../models/users';
 import { IProfile } from '../models/profiles';
 import checkBody from '../modules/checkBody';
-import { profile } from 'console';
 
 const User = require('../models/users');
 const Profile = require('../models/profiles');
@@ -117,13 +116,13 @@ router.post('/signin', (req: Request, res: Response) => {
 
 router.post('/facebook', (req: Request, res: Response) => {
   // Check if the user han not already been registered
-  User.findOne({ email: req.body.email }).then((data: IUser) => {
+  User.findOne({ facebook_id: req.body.facebook_id }).then((data: IUser) => {
     if (data === null) {
       const newProfile = new Profile({
-        picture: 'default.png',
+        picture: req.body.picture,
         location: 'Unknown',
-        name: 'Unknown',
-        firstName: 'Unknown',
+        name: req.body.last_name,
+        firstName: req.body.first_name,
         activities_id: 'default',
         bio: 'none',
         preferences: { id: 'default', weight: 0, liked: false },
@@ -137,6 +136,7 @@ router.post('/facebook', (req: Request, res: Response) => {
           token: uid2(32),
           profile_id: profileData.id,
           registrationBy: 'facebook',
+          facebook_id: req.body.facebook_id,
         });
 
         newUser.save().then((data: IUser) => {
@@ -165,10 +165,10 @@ router.post('/facebook', (req: Request, res: Response) => {
 
 router.post('/google', (req: Request, res: Response) => {
   // Check if the user han not already been registered
-  User.findOne({ email: req.body.email }).then((data: IUser) => {
+  User.findOne({ google_id: req.body.google_id }).then((data: IUser) => {
     if (data === null) {
       const newProfile = new Profile({
-        picture: `../tmp/icon.png`,
+        picture: req.body.picture,
         location: 'Unknown',
         name: 'Unknown',
         firstName: 'Unknown',
@@ -185,6 +185,7 @@ router.post('/google', (req: Request, res: Response) => {
           token: uid2(32),
           profile_id: profileData.id,
           registrationBy: 'google',
+          google_id: req.body.google_id,
         });
 
         newUser.save().then((data: IUser) => {
