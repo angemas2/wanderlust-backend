@@ -145,6 +145,8 @@ router.post('/facebook', (req: Request, res: Response) => {
             .then(
               res.json({
                 result: true,
+                email: data.email,
+                username: data.username,
                 token: data.token,
                 profile_id: data.profile_id,
               })
@@ -153,12 +155,17 @@ router.post('/facebook', (req: Request, res: Response) => {
       });
     } else {
       //user already exists in database
-      res.json({
-        result: true,
-        username: data.username,
-        token: data.token,
-        profile_id: data.profile_id,
-      });
+      User.findOne({ facebook_id: req.body.facebook_id })
+        .populate('profile_id')
+        .then((data: IUser) => {
+          res.json({
+            result: true,
+            email: data.email,
+            username: data.username,
+            token: data.token,
+            profile_id: data.profile_id,
+          });
+        });
     }
   });
 });
@@ -194,6 +201,8 @@ router.post('/google', (req: Request, res: Response) => {
             .then(
               res.json({
                 result: true,
+                email: data.email,
+                username: data.username,
                 token: data.token,
                 profile_id: data.profile_id,
               })
@@ -202,12 +211,17 @@ router.post('/google', (req: Request, res: Response) => {
       });
     } else {
       //user already exists in database
-      res.json({
-        result: true,
-        username: data.username,
-        token: data.token,
-        profile_id: data.profile_id,
-      });
+      User.findOne({ google_id: req.body.google_id })
+        .populate('profile_id')
+        .then((data: IUser) => {
+          res.json({
+            result: true,
+            email: data.email,
+            username: data.username,
+            token: data.token,
+            profile_id: data.profile_id,
+          });
+        });
     }
   });
 });
