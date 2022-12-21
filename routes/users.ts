@@ -226,4 +226,16 @@ router.post('/google', (req: Request, res: Response) => {
   });
 });
 
+router.get('/:profile_id', (req: Request, res: Response) => {
+  User.findOne({ profile_id: req.params.profile_id })
+    .populate('profile_id')
+    .then((data: IUser) => {
+      if (!data) {
+        res.json({ result: false, error: 'no profile found with this profile ID' });
+      } else {
+        res.json({ result: true, data: data });
+      }
+    });
+});
+
 module.exports = router;
