@@ -55,7 +55,7 @@ router.post('/signup', (req: Request, res: Response) => {
             newUser.save().then((data: IUser) => {
               User.findOne({ email: data.email })
                 .populate('profile_id')
-                .then((newData: IUser, profileData: IProfile) => {
+                .then((newData: IUser) => {
                   res.json({
                     result: true,
                     email: newData.email,
@@ -236,6 +236,32 @@ router.get('/:profile_id', (req: Request, res: Response) => {
         res.json({ result: true, data: data });
       }
     });
+});
+
+router.put('/changePassword/:token', (req: Request, res: Response) => {
+  if (!checkBody(req.body, ['currentPassword', 'newPassword', 'testNewPassword'])) {
+    res.json({ result: false, error: 'Empty or missing fields.' });
+    return;
+  }
+
+  User.findOne({ token: req.params.token }).then((userData: IUser) => {
+    if (!userData) {
+      res.json({ result: false, error: 'no user found. Try again.' });
+    } else if (userData && bcrypt.compareSync(req.body.newPassword, userData.password)) {
+      res.json({ result: false, error: 'New password is the same than current password' });
+    } else if (userData && bcrypt.compareSync(req.body.currentPassword, userData.password)) {
+      const hash = bcrypt.hashSync(req.body.newPassword, 10);
+      User.updateOne({ token: req.params.token }, { password: hash }).then((data: IUser) => {
+        if (data) {
+          res.json({ result: true, data: data });
+        } else {
+          res.json({ result: false, error: 'An error occured. Please try again' });
+        }
+      });
+    } else {
+      res.json({ result: false, error: 'Wrong current password. Please verify your typing' });
+    }
+  });
 });
 
 module.exports = router;

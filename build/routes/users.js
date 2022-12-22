@@ -47,7 +47,7 @@ router.post('/signup', (req, res) => {
                         newUser.save().then((data) => {
                             User.findOne({ email: data.email })
                                 .populate('profile_id')
-                                .then((newData, profileData) => {
+                                .then((newData) => {
                                 res.json({
                                     result: true,
                                     email: newData.email,
@@ -104,13 +104,13 @@ router.post('/signin', (req, res) => {
 });
 router.post('/facebook', (req, res) => {
     // Check if the user han not already been registered
-    User.findOne({ email: req.body.email }).then((data) => {
+    User.findOne({ facebook_id: req.body.facebook_id }).then((data) => {
         if (data === null) {
             const newProfile = new Profile({
-                picture: 'default.png',
+                picture: req.body.picture,
                 location: 'Unknown',
-                name: 'Unknown',
-                firstName: 'Unknown',
+                name: req.body.last_name,
+                firstName: req.body.first_name,
                 activities_id: 'default',
                 bio: 'none',
                 preferences: { id: 'default', weight: 0, liked: false },
@@ -123,12 +123,15 @@ router.post('/facebook', (req, res) => {
                     token: uid2(32),
                     profile_id: profileData.id,
                     registrationBy: 'facebook',
+                    facebook_id: req.body.facebook_id,
                 });
                 newUser.save().then((data) => {
                     User.findOne({ email: data.email })
                         .populate('profile_id')
                         .then(res.json({
                         result: true,
+                        email: data.email,
+                        username: data.username,
                         token: data.token,
                         profile_id: data.profile_id,
                     }));
@@ -137,21 +140,26 @@ router.post('/facebook', (req, res) => {
         }
         else {
             //user already exists in database
-            res.json({
-                result: true,
-                username: data.username,
-                token: data.token,
-                profile_id: data.profile_id,
+            User.findOne({ facebook_id: req.body.facebook_id })
+                .populate('profile_id')
+                .then((data) => {
+                res.json({
+                    result: true,
+                    email: data.email,
+                    username: data.username,
+                    token: data.token,
+                    profile_id: data.profile_id,
+                });
             });
         }
     });
 });
 router.post('/google', (req, res) => {
     // Check if the user han not already been registered
-    User.findOne({ email: req.body.email }).then((data) => {
+    User.findOne({ google_id: req.body.google_id }).then((data) => {
         if (data === null) {
             const newProfile = new Profile({
-                picture: `../tmp/icon.png`,
+                picture: req.body.picture,
                 location: 'Unknown',
                 name: 'Unknown',
                 firstName: 'Unknown',
@@ -167,12 +175,15 @@ router.post('/google', (req, res) => {
                     token: uid2(32),
                     profile_id: profileData.id,
                     registrationBy: 'google',
+                    google_id: req.body.google_id,
                 });
                 newUser.save().then((data) => {
                     User.findOne({ email: data.email })
                         .populate('profile_id')
                         .then(res.json({
                         result: true,
+                        email: data.email,
+                        username: data.username,
                         token: data.token,
                         profile_id: data.profile_id,
                     }));
@@ -181,12 +192,57 @@ router.post('/google', (req, res) => {
         }
         else {
             //user already exists in database
-            res.json({
-                result: true,
-                username: data.username,
-                token: data.token,
-                profile_id: data.profile_id,
+            User.findOne({ google_id: req.body.google_id })
+                .populate('profile_id')
+                .then((data) => {
+                res.json({
+                    result: true,
+                    email: data.email,
+                    username: data.username,
+                    token: data.token,
+                    profile_id: data.profile_id,
+                });
             });
+        }
+    });
+});
+router.get('/:profile_id', (req, res) => {
+    User.findOne({ profile_id: req.params.profile_id })
+        .populate('profile_id')
+        .then((data) => {
+        if (!data) {
+            res.json({ result: false, error: 'no profile found with this profile ID' });
+        }
+        else {
+            res.json({ result: true, data: data });
+        }
+    });
+});
+router.put('/changePassword/:token', (req, res) => {
+    if (!(0, checkBody_1.default)(req.body, ['currentPassword', 'newPassword', 'testNewPassword'])) {
+        res.json({ result: false, error: 'Empty or missing fields.' });
+        return;
+    }
+    User.findOne({ token: req.params.token }).then((userData) => {
+        if (!userData) {
+            res.json({ result: false, error: 'no user found. Try again.' });
+        }
+        else if (userData && bcrypt.compareSync(req.body.newPassword, userData.password)) {
+            res.json({ result: false, error: 'New password is the same than current password' });
+        }
+        else if (userData && bcrypt.compareSync(req.body.currentPassword, userData.password)) {
+            const hash = bcrypt.hashSync(req.body.newPassword, 10);
+            User.updateOne({ token: req.params.token }, { password: hash }).then((data) => {
+                if (data) {
+                    res.json({ result: true, data: data });
+                }
+                else {
+                    res.json({ result: false, error: 'An error occured. Please try again' });
+                }
+            });
+        }
+        else {
+            res.json({ result: false, error: 'Wrong current password. Please verify your typing' });
         }
     });
 });
