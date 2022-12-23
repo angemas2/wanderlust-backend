@@ -15,6 +15,8 @@ const bcrypt = require('bcrypt');
 
 const avatar = process.env.DEFAULT_AVATAR;
 
+// the road below allow user to register with his email's address
+
 router.post('/signup', (req: Request, res: Response) => {
   // Check if username and password are both given by user in frontend
   if (!checkBody(req.body, ['username', 'email', 'password'])) {
@@ -87,6 +89,8 @@ router.post('/signup', (req: Request, res: Response) => {
   });
 });
 
+//the road below handle the login of user with his email address
+
 router.post('/signin', (req: Request, res: Response) => {
   // Check if username and password are both given by user in frontend
   if (!checkBody(req.body, ['email', 'password'])) {
@@ -113,6 +117,14 @@ router.post('/signin', (req: Request, res: Response) => {
     }
   });
 });
+
+/* the following roads (/facebook & /google) below handle the registration & login of a user
+with a Facebook or a Google account. Due that user's need to allow these 
+social networks to allow the sharing of their informations and to be connected on them,
+the authentification part is handle by these networks. Therefore, these roads works the exact same way :
+a check is done on the personnal ID given by the network : 
+on first connection, this ID is registered in DB. If it is already registered,
+then the user is logged to the app */
 
 router.post('/facebook', (req: Request, res: Response) => {
   // Check if the user han not already been registered
@@ -226,6 +238,8 @@ router.post('/google', (req: Request, res: Response) => {
   });
 });
 
+//the road below use the user's profile's ID to get all his informations account
+
 router.get('/:profile_id', (req: Request, res: Response) => {
   User.findOne({ profile_id: req.params.profile_id })
     .populate('profile_id')
@@ -238,28 +252,73 @@ router.get('/:profile_id', (req: Request, res: Response) => {
     });
 });
 
+/* the following roads allow user to change his informations. 
+Token is used in these roads as the primary source of research in DB */
+
+/*the road below allow user to update username & email address 
+be aware than only one information (username or email address) can be updated at a time :
+if user try to updated both, only email address will be updated if possible,
+username part will be ignored.
+*/
+
+router.put('/updateUserInfo/:token', (req: Request, res: Response) => {
+  User.findOne({ token: req.params.token }).then((userData: IUser) => {
+    if (!userData) {
+      res.json({ result: false, error: 'No user found. Try again.' }); // if no user is found in DB with the given token in params, return an error message
+    } else if (req.body.email) {
+      // check if a new email address is given by user
+      User.findOne({ email: req.body.email }).then((userData: IUser) => {
+        // check if new email adress already exist in DB
+        userData
+          ? res.json({ result: false, error: 'Email address already registered' }) // if yes, then return an error message
+          : User.updateOne({ token: req.params.token }, { email: req.body.email }).then(
+              (emailData: IUser) => {
+                emailData
+                  ? res.json({ result: true, response: 'Email address updated succesfully' }) // if no, then email address is updated
+                  : res.json({ result: false, error: 'An error occured. Try again' }); // if email address isn't registered but cannot be updated for some reason, then return an error message
+              }
+            );
+      });
+    } else if (req.body.username) {
+      // check if a new username is given by user
+      User.findOne({ username: req.body.username }).then((userData: IUser) => {
+        // check if new username is not already registered in DB
+        userData
+          ? res.json({ result: false, error: 'Username already taken' }) // if yes, then return an error message
+          : User.updateOne({ token: req.params.token }, { username: req.body.username }).then(
+              (usernameData: IUser) => {
+                usernameData
+                  ? res.json({ result: true, response: 'Username updated succesfully' }) // if no, than username is updated
+                  : res.json({ result: false, error: 'An error occured. Try again' }); // if username isn't registered but cannot be updated for some reason, then return an error message
+              }
+            );
+      });
+    }
+  });
+});
+
+// the road below allow user to change his password
 router.put('/changePassword/:token', (req: Request, res: Response) => {
   if (!checkBody(req.body, ['currentPassword', 'newPassword', 'testNewPassword'])) {
+    // Check all fields are given by user in frontend
     res.json({ result: false, error: 'Empty or missing fields.' });
     return;
   }
 
   User.findOne({ token: req.params.token }).then((userData: IUser) => {
     if (!userData) {
-      res.json({ result: false, error: 'no user found. Try again.' });
+      res.json({ result: false, error: 'No user found. Try again.' }); // if no user is found in DB with the given token in params, return an error message
     } else if (userData && bcrypt.compareSync(req.body.newPassword, userData.password)) {
-      res.json({ result: false, error: 'New password is the same than current password' });
+      res.json({ result: false, error: 'New password is the same than current password' }); // if user type the same password than current registered in DB, return an error message
     } else if (userData && bcrypt.compareSync(req.body.currentPassword, userData.password)) {
-      const hash = bcrypt.hashSync(req.body.newPassword, 10);
+      const hash = bcrypt.hashSync(req.body.newPassword, 10); //variable called to hash new password given by user when registering it in DB.
       User.updateOne({ token: req.params.token }, { password: hash }).then((data: IUser) => {
-        if (data) {
-          res.json({ result: true, data: data });
-        } else {
-          res.json({ result: false, error: 'An error occured. Please try again' });
-        }
+        data
+          ? res.json({ result: true, data: data }) // if everything is OK, change the password in DB
+          : res.json({ result: false, error: 'An error occured. Please try again' }); // if despite everything seems to be OK but password cannot be change, return an error message
       });
     } else {
-      res.json({ result: false, error: 'Wrong current password. Please verify your typing' });
+      res.json({ result: false, error: 'Wrong current password. Please verify your typing' }); // if user mystype his current password registered in DB, return an error message
     }
   });
 });

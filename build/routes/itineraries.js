@@ -9,13 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express = require("express");
+var express = require('express');
 var router = express.Router();
-require("../models/connection");
-const Viewpoint = require("../models/viewpoints");
-const Itinerary = require("../models/itineraries");
+require('../models/connection');
+const Itinerary = require('../models/itineraries');
 // create a new itinerary
-router.post("/addItinerary", (req, res) => {
+router.post('/addItinerary', (req, res) => {
     console.log(req.body);
     Itinerary.findOne({ name: req.body.name }).then((data) => {
         if (!data) {
@@ -30,78 +29,78 @@ router.post("/addItinerary", (req, res) => {
                 isPublic: req.body.public,
                 isCustom: req.body.custom,
                 rating: 0,
-                tags: "",
-                followers: "",
+                tags: '',
+                followers: '',
                 isSponsor: false,
                 city: req.body.city,
             });
             NewItinerary.save().then((x) => {
                 Itinerary.findById(x._id)
-                    .populate(["viewpoints_id", "profile_id"])
+                    .populate(['viewpoints_id', 'profile_id'])
                     .then((data) => res.json({ result: true, data }));
             });
         }
         else {
-            res.json({ result: false, error: "itinerary already exists" });
+            res.json({ result: false, error: 'itinerary already exists' });
         }
     });
 });
 // get itinerary by city
-router.get("/:city", (req, res) => {
+router.get('/:city', (req, res) => {
     Itinerary.find({
-        city: { $regex: new RegExp(req.params.city, "i") },
+        city: { $regex: new RegExp(req.params.city, 'i') },
         public: true,
     })
-        .populate(["viewpoints_id", "profile_id"])
+        .populate(['viewpoints_id', 'profile_id'])
         .then((data) => {
         if (data) {
             res.json({ result: true, data: data });
         }
         else {
-            res.json({ result: false, error: "no itinerary" });
+            res.json({ result: false, error: 'no itinerary' });
         }
     });
 });
 //get itineraries created by the user
-router.get("/profile/:profile", (req, res) => {
+router.get('/profile/:profile', (req, res) => {
     Itinerary.find({ profile_id: req.params.profile })
-        .populate(["viewpoints_id", "profile_id"])
+        .populate(['viewpoints_id', 'profile_id'])
         .then((data) => {
         if (data) {
             res.json({ result: true, data: data });
         }
         else {
-            res.json({ result: false, error: "no itinerary for this profile" });
+            res.json({ result: false, error: 'no itinerary for this profile' });
         }
     });
 });
 // get itineraries followed by the user
-router.get("/followed/:profile", (req, res) => {
+router.get('/followed/:profile', (req, res) => {
     Itinerary.find()
-        .populate("viewpoints_id")
+        .populate('viewpoints_id')
         .then((data) => {
         if (data) {
             let newdata = data.filter((e) => e.followers.includes(req.params.profile));
             res.json({ result: true, data: newdata });
         }
         else {
-            res.json({ result: false, error: "no itinerary found" });
+            res.json({ result: false, error: 'no itinerary found' });
         }
     });
 });
 // add user as follower when he is following an existing itinerary
-router.put("/followers", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/followers', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const ItineraryId = yield Itinerary.findById(req.body.id);
     const followers = ItineraryId.followers;
     const userId = req.body.userId;
     Itinerary.findById(req.body.id)
-        .populate(["viewpoints_id", "profile_id"])
+        .populate(['viewpoints_id', 'profile_id'])
         .then((data) => {
         var _a;
         if ((_a = data.followers) === null || _a === void 0 ? void 0 : _a.includes(userId)) {
             res.json({
                 result: true,
-                message: "itinerary already followed",
+                message: 'itinerary already followed',
                 data: data,
             });
         }
@@ -109,8 +108,8 @@ router.put("/followers", (req, res) => __awaiter(void 0, void 0, void 0, functio
             Itinerary.findByIdAndUpdate(req.body.id, {
                 followers: [...followers, userId],
             }).then(Itinerary.findById(req.body.id)
-                .populate(["viewpoints_id", "profile_id"])
-                .then((data) => res.json({ result: true, message: "added", data: data })));
+                .populate(['viewpoints_id', 'profile_id'])
+                .then((data) => res.json({ result: true, message: 'added', data: data })));
         }
     });
 }));
