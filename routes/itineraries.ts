@@ -4,6 +4,7 @@ require('../models/connection');
 import { Request, Response } from 'express';
 import { IItinerary } from '../models/itineraries';
 
+
 const Itinerary = require('../models/itineraries');
 
 // create a new itinerary
@@ -114,6 +115,13 @@ router.put('/followers', async (req: Request, res: Response) => {
         );
       }
     });
+
+
+
+
+
+
+
 });
 
 module.exports = router;

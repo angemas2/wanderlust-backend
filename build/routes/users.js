@@ -33,8 +33,8 @@ router.post('/signup', (req, res) => {
     newProfile.save().then((profileData) => {
         User.findOne({ email: req.body.email }).then((userData) => {
             // Check if User's email han not already been registered. If no, create User
-            if (!userData) {
-                User.findOne({ username: req.body.username }).then((data) => {
+            !userData
+                ? User.findOne({ username: req.body.username }).then((data) => {
                     if (!data) {
                         const hash = bcrypt.hashSync(req.body.password, 10);
                         const newUser = new User({
@@ -65,15 +65,12 @@ router.post('/signup', (req, res) => {
                             error: "Nom d'utilisateur déjà pris",
                         }));
                     }
-                });
-                // If yes, Delete Profile and send error
-            }
-            else {
-                Profile.findByIdAndDelete(profileData.id).then(res.json({
-                    result: false,
-                    error: 'Utilisateur existant pour cette adresse email',
-                }));
-            }
+                })
+                : // If yes, Delete Profile and send error
+                    Profile.findByIdAndDelete(profileData.id).then(res.json({
+                        result: false,
+                        error: 'Utilisateur existant pour cette adresse email',
+                    }));
         });
     });
 });
@@ -85,8 +82,8 @@ router.post('/signin', (req, res) => {
         return;
     }
     User.findOne({ email: req.body.email }).then((data) => {
-        if (data && bcrypt.compareSync(req.body.password, data.password)) {
-            User.findOne({ email: data.email })
+        data && bcrypt.compareSync(req.body.password, data.password)
+            ? User.findOne({ email: data.email })
                 .populate('profile_id')
                 .then((newData) => {
                 res.json({
@@ -96,12 +93,9 @@ router.post('/signin', (req, res) => {
                     token: newData.token,
                     profile_id: newData.profile_id,
                 });
-            });
-        }
-        else {
-            //username & password of user are incorrect, connection denied
-            res.json({ result: false, error: 'Utilisateur ou mot de passe erronné' });
-        }
+            })
+            : //username & password of user are incorrect, connection denied
+                res.json({ result: false, error: 'Utilisateur ou mot de passe erronné' });
     });
 });
 /* the following roads (/facebook & /google) below handle the registration & login of a user
@@ -220,12 +214,9 @@ router.get('/:profile_id', (req, res) => {
     User.findOne({ profile_id: req.params.profile_id })
         .populate('profile_id')
         .then((data) => {
-        if (!data) {
-            res.json({ result: false, error: 'no profile found with this profile ID' });
-        }
-        else {
-            res.json({ result: true, data: data });
-        }
+        !data
+            ? res.json({ result: false, error: 'no profile found with this profile ID' })
+            : res.json({ result: true, data: data });
     });
 });
 /* the following roads allow user to change his informations.
