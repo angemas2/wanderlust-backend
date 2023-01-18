@@ -9,12 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const request = require("supertest");
-const users = require("../routes/users");
-it("POST signin", () => __awaiter(void 0, void 0, void 0, function* () {
-    const res = yield request(users).post("/signin").send({
-        username: "angemas",
-        password: "test123",
-    });
+const itineraries = require("../routes/itineraries");
+it("GET itineraries", () => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield request(itineraries).get("/bruxelles");
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(true);
 }));

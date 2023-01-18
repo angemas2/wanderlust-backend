@@ -1,11 +1,8 @@
 const request = require("supertest");
-const users = require("../routes/users");
+const itineraries=require("../routes/itineraries")
 
-it("POST signin", async () => {
-  const res = await request(users).post("/signin").send({
-    username: "angemas",
-    password: "test123",
-  });
+it("GET itineraries", async () => {
+  const res = await request(itineraries).get("/bruxelles");
 
   expect(res.statusCode).toBe(200);
   expect(res.body.result).toBe(true);
