@@ -34,13 +34,8 @@ router.post("/newActivity", async (req: Request, res: Response) => {
 
 // add pictures to a user existing activity
 router.put("/:activityId/addPictures", async (req: any, res: Response) => {
-  const photoPath = `./tmp/${uniqid()}.jpg`;
-  const resultMove = await req.files.newphoto.mv(photoPath);
-  const resultCloudinary = await cloudinary.uploader.upload(photoPath);
-
-  fs.unlinkSync(photoPath);
-
   const activityId = req.params.activityId;
+  const buffer = req.body.buffer;
 
   try {
     const activity = await Activity.findById(activityId);
@@ -48,9 +43,12 @@ router.put("/:activityId/addPictures", async (req: any, res: Response) => {
     // check that activity exists
     if (!activity) {
       return res.json({ result: false, message: "activity not found" });
-    } else if (!resultMove) {
+    } else {
+      const result = await cloudinary.uploader.upload(buffer, {
+        resource_type: "raw",
+      });
       Activity.findByIdAndUpdate(activityId, {
-        photos: [...photos, resultCloudinary.secure_url],
+        photos: [...photos, result.secure_url],
       }).then((data: IActivity) =>
         res.json({ result: true, message: "new picture added", data })
       );
