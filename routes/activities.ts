@@ -63,10 +63,9 @@ router.put("/:activityId/addPictures", async (req: any, res: Response) => {
               res.status(500).send(error);
             } else {
               console.log(result);
-              await Activity.findByIdAndUpdate(activityId, {
+              Activity.findByIdAndUpdate(activityId, {
                 photos: [...photos, result.secure_url],
-              });
-              res.send(result);
+              }).then((data: IActivity) => res.json({ result: true, data }));
             }
           }
         )
