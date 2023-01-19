@@ -113,7 +113,7 @@ router.get("/:profile_id/:type", async (req: Request, res: Response) => {
     const profile_id = req.params.profile_id;
 
     const data = await Activity.find({ profile_id, type }).populate([
-      "itinerary_id",
+      { path: "itinerary_id", populate: { path: "viewpoints_id" } },
       "profile_id",
     ]);
 

@@ -16,6 +16,11 @@ const Activity = require("../models/activities");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const streamifier = require("streamifier");
+cloudinary.config({
+    cloud_name: "dp6ldy3ti",
+    api_key: "727571472679694",
+    api_secret: "P9z_J77Uud4WaGy_5nI4shAR67k",
+});
 //add new activity
 router.post("/newActivity", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let itinerary_id = req.body.itinerary_id;
@@ -55,17 +60,16 @@ router.put("/:activityId/addPictures", (req, res) => __awaiter(void 0, void 0, v
                 }
                 else {
                     console.log(result);
-                    yield Activity.findByIdAndUpdate(activityId, {
+                    Activity.findByIdAndUpdate(activityId, {
                         photos: [...photos, result.secure_url],
-                    });
-                    res.send(result);
+                    }).then((data) => res.json({ result: true, data }));
                 }
             }))
                 .end(imageBuffer);
         });
     }
     catch (error) {
-        res.json({ result: false, message: "message" });
+        res.json({ result: false, error });
     }
     /*
     try {
@@ -103,7 +107,7 @@ router.get("/:profile_id/:type", (req, res) => __awaiter(void 0, void 0, void 0,
         const type = req.params.type;
         const profile_id = req.params.profile_id;
         const data = yield Activity.find({ profile_id, type }).populate([
-            "itinerary_id",
+            { path: "itinerary_id", populate: { path: "viewpoints_id" } },
             "profile_id",
         ]);
         res.json({ result: true, data });
