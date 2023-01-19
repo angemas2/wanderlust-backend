@@ -9,6 +9,12 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const streamifier = require("streamifier");
 
+cloudinary.config({
+  cloud_name: "dp6ldy3ti",
+  api_key: "727571472679694",
+  api_secret: "P9z_J77Uud4WaGy_5nI4shAR67k",
+});
+
 //add new activity
 router.post("/newActivity", async (req: Request, res: Response) => {
   let itinerary_id = req.body.itinerary_id;
@@ -67,7 +73,7 @@ router.put("/:activityId/addPictures", async (req: any, res: Response) => {
         .end(imageBuffer);
     });
   } catch (error) {
-    res.json({ result: false, message: "message" });
+    res.json({ result: false, error });
   }
 
   /* 
