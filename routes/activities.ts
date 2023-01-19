@@ -7,8 +7,7 @@ import { IActivity } from "../models/activities";
 const Activity = require("../models/activities");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
-
-const uniqid = require("uniqid");
+const streamifier = require("streamifier");
 
 //add new activity
 router.post("/newActivity", async (req: Request, res: Response) => {
@@ -35,12 +34,54 @@ router.post("/newActivity", async (req: Request, res: Response) => {
 // add pictures to a user existing activity
 router.put("/:activityId/addPictures", async (req: any, res: Response) => {
   const activityId = req.params.activityId;
-  const buffer = req.body.buffer;
 
   try {
     const activity = await Activity.findById(activityId);
     const photos = activity.photos;
+
+    const imageData: any = [];
+
+    req.on("data", (data: any) => {
+      imageData.push(data);
+    });
+
+    req.on("end", () => {
+      const imageBuffer = Buffer.concat(imageData);
+
+      cloudinary.uploader
+        .upload_stream(
+          { resource_type: "image" },
+          async (error: any, result: any) => {
+            if (error) {
+              console.error(error);
+              res.status(500).send(error);
+            } else {
+              console.log(result);
+              await Activity.findByIdAndUpdate(activityId, {
+                photos: [...photos, result.secure_url],
+              });
+              res.send(result);
+            }
+          }
+        )
+        .end(imageBuffer);
+    });
+  } catch (error) {
+    res.json({ result: false, message: "message" });
+  }
+
+  /* 
+  try {
+    const activity = await Activity.findById(activityId);
+    const photos = activity.photos;
+     const imageData = [];
     // check that activity exists
+
+  req.on("data", (data) => {
+    imageData.push(data);
+  });
+
+
     if (!activity) {
       return res.json({ result: false, message: "activity not found" });
     } else {
@@ -57,7 +98,7 @@ router.put("/:activityId/addPictures", async (req: any, res: Response) => {
     res
       .status(500)
       .json({ result: false, message: "Failed to add new picture", error });
-  }
+  } */
 });
 
 //get all user activities by type custom or followed

@@ -15,7 +15,7 @@ require("../models/connection");
 const Activity = require("../models/activities");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
-const uniqid = require("uniqid");
+const streamifier = require("streamifier");
 //add new activity
 router.post("/newActivity", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let itinerary_id = req.body.itinerary_id;
@@ -37,29 +37,65 @@ router.post("/newActivity", (req, res) => __awaiter(void 0, void 0, void 0, func
 }));
 // add pictures to a user existing activity
 router.put("/:activityId/addPictures", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const photoPath = `./tmp/${uniqid()}.jpg`;
-    const resultMove = yield req.files.newphoto.mv(photoPath);
-    const resultCloudinary = yield cloudinary.uploader.upload(photoPath);
-    fs.unlinkSync(photoPath);
     const activityId = req.params.activityId;
     try {
         const activity = yield Activity.findById(activityId);
         const photos = activity.photos;
-        // check that activity exists
-        if (!activity) {
-            return res.json({ result: false, message: "activity not found" });
-        }
-        else if (!resultMove) {
-            Activity.findByIdAndUpdate(activityId, {
-                photos: [...photos, resultCloudinary.secure_url],
-            }).then((data) => res.json({ result: true, message: "new picture added", data }));
-        }
+        const imageData = [];
+        req.on("data", (data) => {
+            imageData.push(data);
+        });
+        req.on("end", () => {
+            const imageBuffer = Buffer.concat(imageData);
+            cloudinary.uploader
+                .upload_stream({ resource_type: "image" }, (error, result) => __awaiter(void 0, void 0, void 0, function* () {
+                if (error) {
+                    console.error(error);
+                    res.status(500).send(error);
+                }
+                else {
+                    console.log(result);
+                    yield Activity.findByIdAndUpdate(activityId, {
+                        photos: [...photos, result.secure_url],
+                    });
+                    res.send(result);
+                }
+            }))
+                .end(imageBuffer);
+        });
     }
     catch (error) {
-        res
-            .status(500)
-            .json({ result: false, message: "Failed to add new picture", error });
+        res.json({ result: false, message: "message" });
     }
+    /*
+    try {
+      const activity = await Activity.findById(activityId);
+      const photos = activity.photos;
+       const imageData = [];
+      // check that activity exists
+  
+    req.on("data", (data) => {
+      imageData.push(data);
+    });
+  
+  
+      if (!activity) {
+        return res.json({ result: false, message: "activity not found" });
+      } else {
+        const result = await cloudinary.uploader.upload(buffer, {
+          resource_type: "raw",
+        });
+        Activity.findByIdAndUpdate(activityId, {
+          photos: [...photos, result.secure_url],
+        }).then((data: IActivity) =>
+          res.json({ result: true, message: "new picture added", data })
+        );
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json({ result: false, message: "Failed to add new picture", error });
+    } */
 }));
 //get all user activities by type custom or followed
 router.get("/:profile_id/:type", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
