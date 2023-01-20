@@ -68,7 +68,8 @@ router.put("/:activityId/addPictures", async (req: any, res: Response) => {
                 activityId,
                 {
                   photos: [...photos, result.secure_url],
-                }
+                },
+                { new: true }
               );
               res.json({ result: true, data: updateActivity });
             }

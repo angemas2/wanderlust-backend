@@ -62,7 +62,7 @@ router.put("/:activityId/addPictures", (req, res) => __awaiter(void 0, void 0, v
                     console.log(result);
                     const updateActivity = yield Activity.findByIdAndUpdate(activityId, {
                         photos: [...photos, result.secure_url],
-                    });
+                    }, { new: true });
                     res.json({ result: true, data: updateActivity });
                 }
             }))
