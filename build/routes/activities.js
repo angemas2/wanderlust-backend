@@ -60,9 +60,9 @@ router.put("/:activityId/addPictures", (req, res) => __awaiter(void 0, void 0, v
                 }
                 else {
                     console.log(result);
-                    Activity.findByIdAndUpdate(activityId, {
+                    yield Activity.findByIdAndUpdate(activityId, {
                         photos: [...photos, result.secure_url],
-                    }).then((data) => res.json({ result: true, data }));
+                    }).then(Activity.findById(activityId).then((data) => res.json({ result: true, data })));
                 }
             }))
                 .end(imageBuffer);
