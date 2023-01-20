@@ -64,13 +64,13 @@ router.put("/:activityId/addPictures", async (req: any, res: Response) => {
             } else {
               console.log(result);
 
-              await Activity.findByIdAndUpdate(activityId, {
-                photos: [...photos, result.secure_url],
-              }).then(
-                Activity.findById(activityId).then((data: IActivity) =>
-                  res.json({ result: true, data })
-                )
+              const updateActivity = await Activity.findByIdAndUpdate(
+                activityId,
+                {
+                  photos: [...photos, result.secure_url],
+                }
               );
+              res.json({ result: true, data: updateActivity });
             }
           }
         )
@@ -79,36 +79,6 @@ router.put("/:activityId/addPictures", async (req: any, res: Response) => {
   } catch (error) {
     res.json({ result: false, error });
   }
-
-  /* 
-  try {
-    const activity = await Activity.findById(activityId);
-    const photos = activity.photos;
-     const imageData = [];
-    // check that activity exists
-
-  req.on("data", (data) => {
-    imageData.push(data);
-  });
-
-
-    if (!activity) {
-      return res.json({ result: false, message: "activity not found" });
-    } else {
-      const result = await cloudinary.uploader.upload(buffer, {
-        resource_type: "raw",
-      });
-      Activity.findByIdAndUpdate(activityId, {
-        photos: [...photos, result.secure_url],
-      }).then((data: IActivity) =>
-        res.json({ result: true, message: "new picture added", data })
-      );
-    }
-  } catch (error) {
-    res
-      .status(500)
-      .json({ result: false, message: "Failed to add new picture", error });
-  } */
 });
 
 //get all user activities by type custom or followed
