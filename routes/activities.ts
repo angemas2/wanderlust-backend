@@ -107,9 +107,9 @@ router.delete("/deleteactivity", async (req: Request, res: Response) => {
     await Activity.findByIdAndDelete(id);
     const found = await Activity.findById(id);
     if (found) {
-      res.json({ result: false });
+      res.json({ result: false, found });
     } else {
-      res.json({ result: true });
+      res.json({ result: true, found });
     }
   } catch (err) {
     console.log(err);
