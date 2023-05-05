@@ -101,23 +101,19 @@ router.get("/:profile_id/:type", async (req: Request, res: Response) => {
 });
 
 //delete pictures
-router.post("/deleteactivity", async (req: Request, res: Response) => {
+router.delete("/deleteactivity", async (req: Request, res: Response) => {
   try {
-    console.log("test");
     const { id } = req.body;
-    const data = await Activity.findById(id).populate([
-      "itinerary_id",
-      "profile_id",
-    ]);
-
-    console.log(data);
-
-    if (data.length === 0) {
-      res.json({ result: false, data });
-    } else res.json({ result: true, data });
+    await Activity.findByIdAndDelete(id);
+    const found = await Activity.findById(id);
+    if (found) {
+      res.json({ result: false });
+    } else {
+      res.json({ result: true });
+    }
   } catch (err) {
     console.log(err);
-    res.json({ result: "error" });
+    res.json({ result: false, error: "activity not found" });
   }
 });
 
