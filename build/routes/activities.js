@@ -90,5 +90,17 @@ router.get("/:profile_id/:type", (req, res) => __awaiter(void 0, void 0, void 0,
     }
 }));
 //delete pictures
+router.post("/deleteactivity", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.body;
+    yield Activity.findById(id);
+    const found = yield Activity.findById(id);
+    console.log(found);
+    if (found) {
+        res.json({ result: false });
+    }
+    if (!found) {
+        res.json({ result: true });
+    }
+}));
 //delete activity
 module.exports = router;
